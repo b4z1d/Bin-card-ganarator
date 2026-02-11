@@ -1,19 +1,25 @@
 // app_core.js
 
-// --- DATABASE & SESSION ---
-const DB_KEY = 'rafi_pay_master_v2';
-const SESSION_KEY = 'rafi_pay_session_v2';
+// --- DATABASE & SESSION CONFIG ---
+const DB_KEY = 'rafi_pay_master_v3';
+const SESSION_KEY = 'rafi_pay_session_active';
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
 function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
 
-// --- UTILS ---
+// --- UI UTILS ---
 function showToast(msg, type='success') {
     const t = document.getElementById('toast');
     if(!t) return;
     document.getElementById('toast-msg').innerText = msg;
     const icon = document.getElementById('toast-icon');
-    icon.className = type === 'error' ? 'fa-solid fa-circle-xmark text-red-500' : 'fa-solid fa-circle-check text-green-500';
+    
+    if(type === 'error') {
+        icon.className = 'fa-solid fa-circle-xmark text-red-500';
+    } else {
+        icon.className = 'fa-solid fa-circle-check text-green-500';
+    }
+    
     t.style.top = "20px";
     setTimeout(() => t.style.top = "-100px", 2500);
 }
@@ -40,10 +46,10 @@ function switchTab(tabName) {
     document.getElementById('btn-' + tabName).classList.add('active');
 }
 
-// --- CORE FUNCTIONS ---
+// --- CORE LOGIC ---
 let currentUser = null;
 
-// Auto Login
+// Auto Login Check
 window.addEventListener('DOMContentLoaded', () => {
     checkSession();
 });
@@ -72,6 +78,7 @@ function handleLogin() {
 
     if(!email || !pass) { showToast("Enter credentials", "error"); return; }
 
+    // Admin Vault Check
     const admin = typeof SECURE_VAULT !== 'undefined' ? SECURE_VAULT.find(a => atob(a.e) === email && atob(a.p) === pass) : null;
     
     if(admin) {
@@ -139,29 +146,30 @@ function handleLogout() {
     switchScreen('screen-login');
 }
 
-// --- UPDATED CARD GENERATOR ---
+// --- MASTERCARD GENERATOR (Luhn Algorithm) ---
 function generateCard(name) {
-    // 1. Generate Mastercard Number (Starts with 51-55)
-    const prefix = 51 + Math.floor(Math.random() * 5); 
-    let num = prefix.toString(); 
+    const prefix = 51 + Math.floor(Math.random() * 5);
+    let num = prefix.toString();
     while(num.length < 15) num += Math.floor(Math.random()*10);
     
-    // Luhn Checksum
     let sum=0, d=false;
-    for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
+    for(let i=num.length-1; i>=0; i--){
+        let n=parseInt(num[i]);
+        if(d){if((n*=2)>9)n-=9;}
+        sum+=n; d=!d;
+    }
     const fullNum = num + ((sum*9)%10);
 
-    // 2. Generate Valid Future Date
-    const currentYear = new Date().getFullYear() % 100; // e.g., 24
-    const expYear = currentYear + Math.floor(Math.random() * 5) + 1; // 25 to 29
-    let expMonth = Math.floor(Math.random() * 12) + 1; // 1 to 12
-    if(expMonth < 10) expMonth = '0' + expMonth; // Pad with 0
+    const currentYear = new Date().getFullYear() % 100;
+    const expYear = currentYear + Math.floor(Math.random() * 4) + 2;
+    let expMonth = Math.floor(Math.random() * 12) + 1;
+    if(expMonth < 10) expMonth = '0' + expMonth;
 
     return {
         number: fullNum,
         holder: name.toUpperCase(),
         exp: `${expMonth}/${expYear}`,
-        cvv: Math.floor(Math.random() * 899 + 100) // 100 to 999
+        cvv: Math.floor(Math.random() * 899 + 100)
     };
 }
 
@@ -194,33 +202,39 @@ function copyCardNum() {
 
 function copyAllIdentity() {
     const c = currentUser.card;
-    const info = `Name: ${c.holder}\nMastercard: ${c.number}\nExp: ${c.exp}\nCVV: ${c.cvv}`;
+    const info = `Name: ${c.holder}\nCard: ${c.number}\nExp: ${c.exp}\nCVV: ${c.cvv}`;
     navigator.clipboard.writeText(info).then(() => showToast("Info Copied!"));
 }
 
-// --- ADDRESS GENERATOR ---
+// --- BILLING ADDRESS GENERATOR ---
 function pasteFromClip() {
     navigator.clipboard.readText().then(text => {
         document.getElementById('paste-card-input').value = text;
         showToast("Pasted!");
     }).catch(err => {
-        showToast("Clipboard permission required!", "error");
+        showToast("Permission Denied", "error");
     });
 }
 
 function generateBillingAddress() {
-    let input = document.getElementById('paste-card-input').value.replace(/\D/g, ''); 
+    let rawInput = document.getElementById('paste-card-input').value;
+    let cleanInput = rawInput.replace(/\D/g, '');
 
-    // Auto-fill from dashboard if empty
-    if (input.length === 0 && currentUser && currentUser.card) {
-        input = currentUser.card.number;
-        document.getElementById('paste-card-input').value = input.match(/.{1,4}/g).join(' ');
-        showToast("Using Active Card!");
+    // Auto-select if empty
+    if (cleanInput.length === 0) {
+        if (currentUser && currentUser.card) {
+            cleanInput = currentUser.card.number;
+            document.getElementById('paste-card-input').value = cleanInput.match(/.{1,4}/g).join(' ');
+            showToast("Auto-selected Active Card!");
+        } else {
+            showToast("No Card Found!", "error");
+            return;
+        }
     }
 
-    if(input.length < 13) { 
-        showToast("Invalid Card Number", "error"); 
-        return; 
+    if(cleanInput.length < 13) {
+        showToast("Invalid Card Format", "error");
+        return;
     }
 
     const streets = ["Maple Ave", "Oak St", "Washington Blvd", "Lakeview Dr", "Sunset Blvd", "Broadway", "Highland Park"];
@@ -243,8 +257,9 @@ function generateBillingAddress() {
     document.getElementById('res-zip').innerText = randomCity.z;
     document.getElementById('res-phone').innerText = randomPhone;
 
-    document.getElementById('address-result').classList.remove('hidden');
-    document.getElementById('address-result').scrollIntoView({ behavior: 'smooth' });
+    const resBox = document.getElementById('address-result');
+    resBox.classList.remove('hidden');
+    resBox.scrollIntoView({ behavior: 'smooth' });
 }
 
 function copyBilling() {
@@ -256,4 +271,4 @@ function copyBilling() {
     
     const full = `Street: ${s}\nCity: ${c}\nState: ${st}\nZip: ${z}\nPhone: ${p}\nCountry: USA`;
     navigator.clipboard.writeText(full).then(() => showToast("Address Copied!"));
-        }
+}
