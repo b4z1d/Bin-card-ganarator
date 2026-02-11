@@ -3,240 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevTools Dashboard & Virtual Card</title>
+    <title>Rafi Card Tools Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500&display=swap" rel="stylesheet">
     <style>
-        .font-mono-card { font-family: 'Share Tech Mono', monospace; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        .font-ocr { font-family: 'Share Tech Mono', monospace; }
+        .font-brand { font-family: 'Orbitron', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Glassmorphism for the card */
-        .glass-card {
-            background: linear-gradient(135deg, rgba(29, 78, 216, 0.9), rgba(30, 64, 175, 0.95));
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255,255,255,0.2);
-            border-left: 1px solid rgba(255,255,255,0.2);
+
+        /* Real Card Gradient & Texture */
+        .real-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
+            box-shadow: 0 20px 60px -15px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Holographic Shine */
+        .real-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 200%; height: 100%;
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.1) 45%, transparent 60%);
+            transition: all 0.5s;
+            pointer-events: none;
+        }
+        .real-card:hover::before {
+            left: 100%;
+            transition: 0.7s;
+        }
+        
+        /* Gold Chip Effect */
+        .chip {
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chip::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.3);
+        }
+        .chip::before {
+            content: '';
+            position: absolute;
+            left: 30%; top: 0; width: 1px; height: 100%; background: rgba(0,0,0,0.3);
         }
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-md md:max-w-2xl bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700 p-6 relative min-h-[600px]">
+    <div class="w-full max-w-3xl bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 p-6 md:p-8">
         
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold tracking-wider text-slate-200">CC TOOLS <span class="text-blue-500">PRO</span></h1>
-            <p class="text-slate-400 text-xs mt-1">Virtual Card & Validator Suite</p>
+        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-white">RAFI <span class="text-indigo-500">TOOLS</span></h1>
+                <p class="text-slate-500 text-xs uppercase tracking-widest">Premium Card Generator Suite</p>
+            </div>
+            <div class="text-right hidden md:block">
+                <span class="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-xs text-slate-400 ml-1">System Online</span>
+            </div>
         </header>
 
-        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in">
-            <button onclick="showTool('bin-checker')" class="h-32 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 hover:scale-105 transition-all flex flex-col items-center justify-center shadow-lg group">
-                <span class="text-4xl mb-2">🔍</span>
-                <span class="font-bold">BIN Checker</span>
+        <div id="main-menu" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 fade-in">
+            <button onclick="showTool('card-generator')" class="col-span-2 md:col-span-2 h-40 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-800 hover:scale-[1.02] transition-transform shadow-lg relative overflow-hidden group border border-blue-500/30">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition"></div>
+                <div class="relative z-10 flex flex-col items-center justify-center h-full">
+                    <span class="text-5xl mb-2">💳</span>
+                    <span class="font-bold text-xl text-white">GENERATE CARD</span>
+                    <span class="text-xs text-blue-200 mt-1">Get Number, CVV & Address</span>
+                </div>
             </button>
 
-            <button onclick="showTool('card-generator')" class="h-32 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 hover:scale-105 transition-all flex flex-col items-center justify-center shadow-lg border-2 border-blue-400/30">
-                <span class="text-4xl mb-2">💳</span>
-                <span class="font-bold">Virtual Visa Gen</span>
+            <button onclick="showTool('bin-checker')" class="h-40 rounded-2xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-center justify-center group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition">🔍</span>
+                <span class="font-bold text-slate-300">BIN Check</span>
             </button>
 
-            <button onclick="showTool('card-checker')" class="h-32 rounded-xl bg-gradient-to-br from-green-600 to-green-700 hover:scale-105 transition-all flex flex-col items-center justify-center shadow-lg">
-                <span class="text-4xl mb-2">✅</span>
-                <span class="font-bold">Luhn Validator</span>
-            </button>
-
-            <button onclick="showTool('bin-generator')" class="h-32 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:scale-105 transition-all flex flex-col items-center justify-center shadow-lg">
-                <span class="text-4xl mb-2">🎲</span>
-                <span class="font-bold">BIN Generator</span>
+            <button onclick="showTool('luhn-checker')" class="h-40 rounded-2xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-center justify-center group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition">✅</span>
+                <span class="font-bold text-slate-300">Validator</span>
             </button>
         </div>
 
-        <div id="card-generator" class="tool-view hidden fade-in flex flex-col items-center">
-            <h2 class="text-xl font-bold text-blue-400 mb-6">Virtual Visa Generator</h2>
+        <div id="card-generator" class="hidden fade-in">
+            <div class="flex flex-col md:flex-row gap-8">
+                
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="real-card w-full aspect-[1.586/1] rounded-xl p-6 text-white flex flex-col justify-between select-none">
+                        
+                        <div class="flex justify-between items-start">
+                            <span class="font-brand text-xs tracking-[0.2em] text-slate-400">WORLD CLASS</span>
+                            <svg class="w-8 h-8 text-slate-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+                        </div>
+
+                        <div class="w-12 h-9 chip my-2 border border-yellow-600/50"></div>
+
+                        <div class="mt-2">
+                            <p id="card-num-display" class="font-ocr text-2xl md:text-3xl tracking-widest drop-shadow-md text-slate-100">
+                                4000 0000 0000 0000
+                            </p>
+                            <div class="flex gap-2 items-center mt-1">
+                                <span class="text-[0.5rem] uppercase text-slate-400">1234</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end mt-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[0.4rem] text-slate-300 uppercase">Valid<br>Thru</span>
+                                    <span id="card-exp-display" class="font-ocr text-lg">12/28</span>
+                                </div>
+                                <p id="card-name-display" class="font-ocr text-sm uppercase tracking-widest text-slate-200">MR RAFIUL ISLAM</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-end">
+                                <h2 class="font-brand text-2xl font-bold italic bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">RAFI</h2>
+                                <span class="text-[0.6rem] font-bold tracking-widest text-white uppercase italic">CARD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 space-y-4">
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <h3 class="text-slate-400 text-xs uppercase tracking-widest mb-3 border-b border-slate-700 pb-2">Billing Address</h3>
+                        <div class="space-y-1 font-mono text-sm text-green-400">
+                            <p id="addr-street">123 Random St</p>
+                            <p><span id="addr-city">New York</span>, <span id="addr-state">NY</span> <span id="addr-zip">10001</span></p>
+                            <p class="text-slate-500">United States</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                        <div>
+                            <p class="text-slate-400 text-xs uppercase">CVV / CVC</p>
+                            <p id="card-cvv-display" class="text-xl font-mono text-red-400 font-bold">123</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-slate-400 text-xs uppercase">Status</p>
+                            <p class="text-green-500 text-sm font-bold">● Active</p>
+                        </div>
+                    </div>
+
+                    <button onclick="generateFullIdentity()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transition flex items-center justify-center gap-2">
+                        <span>↻</span> Generate New Identity
+                    </button>
+                    
+                    <button onclick="copyAllData()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg text-sm transition">
+                        Copy All Details
+                    </button>
+                </div>
+            </div>
             
-            <div class="glass-card w-full max-w-sm rounded-2xl shadow-2xl p-6 text-white relative mb-6 transform transition-transform hover:scale-[1.02]">
-                <div class="flex justify-between items-start mb-8">
-                    <div class="w-12 h-9 bg-gradient-to-r from-yellow-200 to-yellow-500 rounded-md border border-yellow-600 opacity-90 flex items-center justify-center">
-                        <div class="w-8 h-5 border border-yellow-700/50 rounded-sm"></div>
-                    </div>
-                    <span class="text-2xl font-bold italic tracking-tighter">VISA</span>
-                </div>
-                
-                <div class="mb-6">
-                    <p class="text-[10px] text-blue-200 uppercase tracking-widest mb-1">Card Number</p>
-                    <p id="vc-number" class="text-2xl font-mono-card tracking-widest drop-shadow-md">4000 0000 0000 0000</p>
-                </div>
-                
-                <div class="flex justify-between items-end">
-                    <div>
-                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">VALID THRU</p>
-                        <p id="vc-date" class="text-lg font-mono-card">MM/YY</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[9px] text-blue-200 uppercase tracking-widest">CVV</p>
-                        <p id="vc-cvv" class="text-lg font-mono-card">•••</p>
-                    </div>
-                </div>
-                
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="mt-8 text-center">
+                <button onclick="goBack()" class="text-slate-500 hover:text-white text-sm">← Back to Main Menu</button>
             </div>
-
-            <div class="w-full max-w-sm space-y-3">
-                <button onclick="generateVisaCard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg transition-colors flex items-center justify-center gap-2">
-                    <span>↻</span> Generate New Card
-                </button>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="copyCardInfo()" class="bg-slate-700 hover:bg-slate-600 text-sm py-2 rounded text-slate-300">Copy Details</button>
-                    <button onclick="checkGeneratedCard()" class="bg-green-700 hover:bg-green-600 text-sm py-2 rounded text-white">Check Validity</button>
-                </div>
-            </div>
-
-            <button onclick="goBack()" class="mt-8 text-slate-500 hover:text-white text-sm">← Back to Dashboard</button>
         </div>
 
-        <div id="bin-checker" class="tool-view hidden fade-in">
-            <h2 class="text-xl font-bold text-orange-500 mb-4">BIN Checker</h2>
-            <input type="text" id="bin-input" maxlength="8" placeholder="Enter first 6 digits" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-center text-xl tracking-widest mb-4">
-            <button onclick="checkBIN()" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-lg mb-4">Search BIN</button>
-            <div id="bin-result" class="bg-slate-900 p-4 rounded-lg min-h-[80px] text-slate-400 text-sm">Result will appear here...</div>
-            <button onclick="goBack()" class="mt-6 text-slate-400 hover:text-white underline w-full text-center">Back</button>
+        <div id="bin-checker" class="hidden fade-in text-center max-w-md mx-auto">
+            <h2 class="text-xl font-bold text-slate-200 mb-4">BIN Lookup</h2>
+            <input type="text" id="bin-input" maxlength="6" class="w-full bg-slate-800 border border-slate-600 p-3 rounded text-center text-xl text-white mb-4" placeholder="First 6 Digits">
+            <button onclick="checkBIN()" class="w-full bg-indigo-600 py-3 rounded font-bold mb-4">Search Database</button>
+            <div id="bin-result" class="text-slate-400 text-sm min-h-[50px]"></div>
+            <button onclick="goBack()" class="mt-4 text-slate-500 hover:text-white">Back</button>
         </div>
 
-        <div id="card-checker" class="tool-view hidden fade-in">
-            <h2 class="text-xl font-bold text-green-500 mb-4">Luhn Algorithm Checker</h2>
-            <input type="text" id="luhn-input" placeholder="Paste Card Number" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-center text-xl tracking-widest mb-4">
-            <button onclick="validateLuhn()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg mb-4">Validate Number</button>
+        <div id="luhn-checker" class="hidden fade-in text-center max-w-md mx-auto">
+            <h2 class="text-xl font-bold text-slate-200 mb-4">Luhn Algorithm Check</h2>
+            <input type="text" id="luhn-input" class="w-full bg-slate-800 border border-slate-600 p-3 rounded text-center text-xl text-white mb-4" placeholder="Enter Full Card Number">
+            <button onclick="validateLuhn()" class="w-full bg-green-600 py-3 rounded font-bold mb-4">Validate Checksum</button>
             <div id="luhn-result" class="hidden p-3 rounded text-center font-bold"></div>
-            <button onclick="goBack()" class="mt-6 text-slate-400 hover:text-white underline w-full text-center">Back</button>
-        </div>
-
-        <div id="bin-generator" class="tool-view hidden fade-in">
-            <h2 class="text-xl font-bold text-red-500 mb-4">Random BIN Gen</h2>
-            <button onclick="generateRandomBIN()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-lg mb-4">Generate</button>
-            <div id="bin-gen-result" class="text-center text-3xl font-mono text-red-400 tracking-widest">------</div>
-            <button onclick="goBack()" class="mt-6 text-slate-400 hover:text-white underline w-full text-center">Back</button>
+            <button onclick="goBack()" class="mt-4 text-slate-500 hover:text-white">Back</button>
         </div>
 
     </div>
 
     <script>
-        // --- Navigation ---
+        // --- DATA SETS FOR RANDOM ADDRESS ---
+        const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Rafi", "Rahim", "Karim"];
+        const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Islam", "Ahmed"];
+        const streets = ["Maple Ave", "Oak Street", "Washington Blvd", "Lakeview Dr", "Cedar Lane", "Park Road", "Sunset Blvd", "Broadway"];
+        const cities = [
+            { name: "New York", state: "NY", zip: "10001" },
+            { name: "Los Angeles", state: "CA", zip: "90001" },
+            { name: "Chicago", state: "IL", zip: "60601" },
+            { name: "Houston", state: "TX", zip: "77001" },
+            { name: "Miami", state: "FL", zip: "33101" },
+            { name: "Seattle", state: "WA", zip: "98101" }
+        ];
+
+        // --- CORE FUNCTIONS ---
+        
         function showTool(id) {
             document.getElementById('main-menu').classList.add('hidden');
-            document.querySelectorAll('.tool-view').forEach(el => el.classList.add('hidden'));
+            ['card-generator', 'bin-checker', 'luhn-checker'].forEach(t => document.getElementById(t).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            if(id === 'card-generator') generateVisaCard(); // Auto gen on open
+            if(id === 'card-generator') generateFullIdentity();
         }
+
         function goBack() {
-            document.querySelectorAll('.tool-view').forEach(el => el.classList.add('hidden'));
+            ['card-generator', 'bin-checker', 'luhn-checker'].forEach(t => document.getElementById(t).classList.add('hidden'));
             document.getElementById('main-menu').classList.remove('hidden');
         }
 
-        // --- 1. VIRTUAL VISA GENERATOR LOGIC ---
-        function generateVisaCard() {
-            // 1. Generate Valid Number (Visa starts with 4)
-            const bin = '4' + Math.floor(Math.random() * 90000 + 10000); // Random Visa BIN
+        // --- GENERATOR LOGIC ---
+        function generateFullIdentity() {
+            // 1. Generate Luhn Valid Number (Start with 4 for Rafi Card/Visa base)
+            let bin = "4" + Math.floor(Math.random() * 90000 + 10000); 
             let num = bin;
-            while (num.length < 15) num += Math.floor(Math.random() * 10);
+            while(num.length < 15) num += Math.floor(Math.random()*10);
             
-            // Calculate Check Digit (Luhn)
-            const checkDigit = calculateLuhnDigit(num);
-            const fullNum = num + checkDigit;
-
-            // 2. Generate Random Date (Future)
-            const today = new Date();
-            const year = today.getFullYear() + Math.floor(Math.random() * 5) + 1; // 1-5 years future
-            let month = Math.floor(Math.random() * 12) + 1;
-            month = month < 10 ? '0' + month : month;
-            const shortYear = year.toString().substr(-2);
-
-            // 3. Generate CVV
-            const cvv = Math.floor(Math.random() * 899) + 100;
-
-            // Update UI
-            document.getElementById('vc-number').innerText = fullNum.match(/.{1,4}/g).join(' '); // Format space
-            document.getElementById('vc-date').innerText = `${month}/${shortYear}`;
-            document.getElementById('vc-cvv').innerText = cvv;
-            
-            // Save for copying/checking
-            window.currentCard = fullNum;
-        }
-
-        function calculateLuhnDigit(str) {
+            // Calculate Check Digit
             let sum = 0;
-            for (let i = 0; i < str.length; i++) {
-                let digit = parseInt(str[str.length - 1 - i]);
-                if (i % 2 === 0) { digit *= 2; if (digit > 9) digit -= 9; }
-                sum += digit;
+            for(let i=0; i<num.length; i++) {
+                let digit = parseInt(num[num.length-1-i]);
+                if(i%2==0) { digit*=2; if(digit>9) digit-=9; }
+                sum+=digit;
             }
-            return (sum * 9) % 10;
-        }
+            let checkDigit = (sum*9)%10;
+            let fullNum = num + checkDigit;
 
-        function copyCardInfo() {
-            const num = document.getElementById('vc-number').innerText;
-            const date = document.getElementById('vc-date').innerText;
-            const cvv = document.getElementById('vc-cvv').innerText;
-            const text = `Number: ${num}\nDate: ${date}\nCVV: ${cvv}`;
-            navigator.clipboard.writeText(text).then(() => alert("Card Details Copied!"));
-        }
-
-        function checkGeneratedCard() {
-            // Send generated number to the Checker tool
-            document.getElementById('luhn-input').value = window.currentCard;
-            showTool('card-checker');
-            validateLuhn();
-        }
-
-        // --- 2. LUHN CHECKER ---
-        function validateLuhn() {
-            const val = document.getElementById('luhn-input').value.replace(/\D/g, '');
-            const res = document.getElementById('luhn-result');
+            // 2. Generate Date
+            let year = new Date().getFullYear() + Math.floor(Math.random()*4) + 1;
+            let month = Math.floor(Math.random()*12) + 1;
+            if(month<10) month = '0'+month;
             
-            if (val.length < 13) {
-                res.innerHTML = "❌ Invalid Length";
-                res.className = "bg-red-900 text-red-200 p-3 rounded block";
-                res.classList.remove('hidden');
-                return;
-            }
+            // 3. Generate CVV
+            let cvv = Math.floor(Math.random()*899)+100;
 
-            let sum = 0, shouldDouble = false;
-            for (let i = val.length - 1; i >= 0; i--) {
-                let digit = parseInt(val.charAt(i));
-                if (shouldDouble) { if ((digit *= 2) > 9) digit -= 9; }
-                sum += digit;
-                shouldDouble = !shouldDouble;
-            }
+            // 4. Generate Name & Address
+            let fname = firstNames[Math.floor(Math.random()*firstNames.length)];
+            let lname = lastNames[Math.floor(Math.random()*lastNames.length)];
+            let fullName = (fname + " " + lname).toUpperCase();
+            
+            let streetNum = Math.floor(Math.random()*9000)+100;
+            let streetName = streets[Math.floor(Math.random()*streets.length)];
+            let cityData = cities[Math.floor(Math.random()*cities.length)];
 
-            const isValid = (sum % 10) === 0;
+            // --- UPDATE UI ---
+            // Format number with spaces
+            document.getElementById('card-num-display').innerText = fullNum.match(/.{1,4}/g).join(' ');
+            document.getElementById('card-exp-display').innerText = `${month}/${year.toString().slice(-2)}`;
+            document.getElementById('card-name-display').innerText = fullName;
+            document.getElementById('card-cvv-display').innerText = cvv;
+            
+            // Address UI
+            document.getElementById('addr-street').innerText = `${streetNum} ${streetName}`;
+            document.getElementById('addr-city').innerText = cityData.name;
+            document.getElementById('addr-state').innerText = cityData.state;
+            document.getElementById('addr-zip').innerText = cityData.zip;
+
+            // Save for copy
+            window.generatedData = `Card: ${fullNum}\nExp: ${month}/${year.toString().slice(-2)} CVV: ${cvv}\nName: ${fullName}\nAddress: ${streetNum} ${streetName}, ${cityData.name}, ${cityData.state} ${cityData.zip}, USA`;
+        }
+
+        function copyAllData() {
+            navigator.clipboard.writeText(window.generatedData).then(() => {
+                alert("All Identity Details Copied to Clipboard!");
+            });
+        }
+
+        // --- VALIDATOR & BIN LOGIC ---
+        function validateLuhn() {
+            let val = document.getElementById('luhn-input').value.replace(/\D/g,'');
+            let res = document.getElementById('luhn-result');
             res.classList.remove('hidden');
-            if(isValid) {
-                res.innerHTML = "✅ VALID CARD NUMBER (Luhn Passed)";
-                res.className = "bg-green-900 text-green-200 p-3 rounded block border border-green-500";
+            
+            if(val.length < 13) {
+                res.innerHTML = "❌ Too Short"; res.className = "text-red-400 bg-red-900/50 p-2 rounded block"; return;
+            }
+            
+            let sum=0, d=false;
+            for(let i=val.length-1; i>=0; i--){
+                let n = parseInt(val.charAt(i));
+                if(d) { if((n*=2)>9) n-=9; }
+                sum+=n; d=!d;
+            }
+            if((sum%10)===0) {
+                res.innerHTML = "✅ Valid Number"; res.className = "text-green-400 bg-green-900/50 p-2 rounded block";
             } else {
-                res.innerHTML = "❌ INVALID CHECKSUM";
-                res.className = "bg-red-900 text-red-200 p-3 rounded block border border-red-500";
+                res.innerHTML = "❌ Invalid Checksum"; res.className = "text-red-400 bg-red-900/50 p-2 rounded block";
             }
         }
 
-        // --- 3. BIN CHECKER & GENERATOR (Simplified) ---
         async function checkBIN() {
-            const bin = document.getElementById('bin-input').value.substring(0,6);
-            const res = document.getElementById('bin-result');
-            res.innerHTML = "Searching...";
+            let bin = document.getElementById('bin-input').value;
+            let res = document.getElementById('bin-result');
+            if(bin.length<6) { res.innerText="Enter 6 digits"; return; }
+            res.innerText = "Searching...";
             try {
-                const req = await fetch(`https://lookup.binlist.net/${bin}`);
-                const data = await req.json();
-                res.innerHTML = `Bank: ${data.bank?.name || 'Unknown'}<br>Scheme: ${data.scheme}<br>Type: ${data.type}<br>Country: ${data.country?.name}`;
+                let r = await fetch(`https://lookup.binlist.net/${bin}`);
+                let d = await r.json();
+                res.innerHTML = `Bank: <span class="text-white">${d.bank?.name || 'N/A'}</span><br>Type: ${d.type} | ${d.scheme}`;
             } catch(e) {
-                res.innerHTML = `<span class='text-yellow-500'>Offline/Limit.</span><br>Brand: ${getBrand(bin)}`;
+                res.innerHTML = "Offline/No Data Found.";
             }
-        }
-        function getBrand(b){ if(b[0]=='4')return 'Visa'; if(b[0]=='5')return 'Mastercard'; return 'Unknown'; }
-        
-        function generateRandomBIN() {
-            document.getElementById('bin-gen-result').innerText = '4' + Math.floor(Math.random()*100000); // Simple Random Visa BIN
         }
     </script>
 </body>
