@@ -5,232 +5,278 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RAFI PAY - Secure Wallet</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #18191a; color: #e4e6eb; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0b0c15; color: white; overflow-x: hidden; }
         .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         
         /* Smooth Screen Transitions */
         .screen {
             position: absolute; width: 100%; min-height: 100vh; top: 0; left: 0;
-            transition: opacity 0.3s ease; opacity: 0; pointer-events: none; display: none;
+            transition: all 0.4s ease; opacity: 0; pointer-events: none; transform: translateY(20px); display: none;
         }
-        .active-screen { opacity: 1; pointer-events: all; display: block; z-index: 10; }
+        .active-screen { opacity: 1; pointer-events: all; transform: translateY(0); display: block; z-index: 10; }
 
-        /* FB Style Inputs */
-        .fb-input {
-            background: #242526; border: 1px solid #3e4042; color: #e4e6eb;
-            border-radius: 8px; padding: 14px 16px; width: 100%; font-size: 16px;
-            transition: border-color 0.2s;
+        /* Modern Wallet Inputs */
+        .wallet-input-group { position: relative; margin-bottom: 20px; }
+        .wallet-input {
+            width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 16px 16px 50px; border-radius: 16px; color: white; font-size: 15px;
+            transition: all 0.3s;
         }
-        .fb-input:focus { border-color: #2d88ff; outline: none; }
-        
-        .fb-btn-primary {
-            background: #2d88ff; color: white; font-weight: 600; border-radius: 8px;
-            padding: 12px; width: 100%; font-size: 16px; transition: background 0.2s;
-        }
-        .fb-btn-primary:active { background: #1a73e8; transform: scale(0.98); }
+        .wallet-input:focus { background: rgba(255, 255, 255, 0.08); border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #64748b; transition: 0.3s; }
+        .wallet-input:focus + .input-icon { color: #6366f1; }
 
-        .fb-btn-green {
-            background: #42b72a; color: white; font-weight: 600; border-radius: 8px;
-            padding: 12px; width: auto; display: inline-block; min-width: 60%;
-            transition: background 0.2s;
+        /* Premium Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white; font-weight: 700; padding: 16px; border-radius: 16px; width: 100%;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); border: none; font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-outline {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white;
+            padding: 14px; border-radius: 16px; width: 100%; font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: white; }
+
+        /* Glass Card Effect */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
         }
 
-        /* GLASS CARD */
-        .glass-card {
-            background: linear-gradient(135deg, #242526, #18191a);
-            border: 1px solid #3e4042; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            border-radius: 16px; position: relative; overflow: hidden;
+        /* Background Mesh Gradient */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
         }
-        .glass-card::after {
-            content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-25deg); animation: shine 3s infinite;
-        }
-        @keyframes shine { 100% { left: 200%; } }
-
-        /* Marquee */
-        .marquee-container { overflow: hidden; white-space: nowrap; background: #242526; padding: 8px 0; border-top: 1px solid #3e4042; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; color: #2d88ff; font-weight: 600; font-size: 0.9rem; }
-        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
     </style>
 </head>
-<body class="bg-[#18191a]">
+<body class="bg-[#0b0c15]">
+    <div class="bg-mesh"></div>
 
-    <div class="w-full max-w-md mx-auto min-h-screen relative bg-[#18191a] shadow-2xl overflow-hidden flex flex-col">
+    <div class="w-full max-w-md mx-auto min-h-screen relative overflow-hidden flex flex-col">
 
-        <div id="toast" class="fixed top-[-100px] left-1/2 -translate-x-1/2 bg-[#333] border border-[#555] px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 transition-all duration-300">
-            <span id="toast-icon" class="text-green-500 text-lg">✓</span>
-            <span id="toast-msg" class="text-sm font-bold text-white">Success</span>
+        <div id="toast" class="fixed top-[-100px] left-1/2 -translate-x-1/2 bg-[#1e293b] border border-[#334155] px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-4 transition-all duration-300 w-[90%] max-w-[350px]">
+            <div id="toast-icon-bg" class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                <i id="toast-icon" class="fa-solid fa-check text-green-500"></i>
+            </div>
+            <div>
+                <h4 id="toast-title" class="font-bold text-white text-sm">Success</h4>
+                <p id="toast-msg" class="text-xs text-gray-400">Action completed successfully.</p>
+            </div>
         </div>
 
-        <div id="screen-login" class="screen active-screen p-6 flex flex-col justify-center min-h-screen">
-            <div class="text-center mb-10">
-                <div class="w-16 h-16 bg-[#2d88ff] rounded-full mx-auto flex items-center justify-center text-3xl font-bold text-white mb-4">
-                    f
+        <div id="screen-login" class="screen active-screen p-8 flex flex-col justify-center min-h-screen">
+            
+            <div class="mb-10 text-center">
+                <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-6 rotate-3">
+                    <i class="fa-solid fa-wallet text-3xl text-white"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-white">RAFI PAY</h1>
-                <p class="text-gray-400 mt-2">Connect with your digital wallet.</p>
+                <h1 class="text-4xl font-extrabold text-white tracking-tight">RAFI PAY</h1>
+                <p class="text-gray-400 mt-2 text-sm">Secure Next-Gen Wallet</p>
             </div>
 
-            <div class="space-y-4">
-                <input type="email" id="login-email" placeholder="Email or Phone" class="fb-input">
-                <div class="relative">
-                    <input type="password" id="login-pass" placeholder="Password" class="fb-input">
+            <div class="glass-panel p-6 mb-8">
+                <div class="wallet-input-group">
+                    <input type="email" id="login-email" placeholder="Email Address" class="wallet-input">
+                    <i class="fa-regular fa-envelope input-icon"></i>
                 </div>
-                <button onclick="handleLogin()" class="fb-btn-primary">Log In</button>
-            </div>
-
-            <div class="mt-4 text-center">
-                <a href="#" class="text-[#2d88ff] text-sm hover:underline">Forgot Password?</a>
-            </div>
-
-            <div class="my-6 flex items-center justify-between">
-                <div class="h-[1px] bg-[#3e4042] flex-1"></div>
-                <span class="px-3 text-gray-500 text-sm">OR</span>
-                <div class="h-[1px] bg-[#3e4042] flex-1"></div>
+                <div class="wallet-input-group">
+                    <input type="password" id="login-pass" placeholder="Master Password" class="wallet-input">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                </div>
+                <div class="flex justify-end mb-4">
+                    <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold">Forgot Password?</a>
+                </div>
+                <button onclick="handleLogin()" class="btn-primary">
+                    Unlock Wallet <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
             </div>
 
             <div class="text-center">
-                <button onclick="switchScreen('screen-reg')" class="fb-btn-green">Create New Account</button>
+                <p class="text-gray-500 text-sm mb-4">New to Rafi Pay?</p>
+                <button onclick="switchScreen('screen-reg')" class="btn-outline">Create Secure Account</button>
             </div>
             
-            <p class="mt-8 text-center text-xs text-gray-500">
-                Secure Login Provided by Rafi Security
+            <p class="mt-auto text-center text-[10px] text-gray-600 uppercase tracking-widest pt-8">
+                <i class="fa-solid fa-shield-halved mr-1"></i> End-to-End Encrypted
             </p>
         </div>
 
-        <div id="screen-reg" class="screen p-6 flex flex-col justify-center min-h-screen">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-white">Join Rafi Pay</h2>
-                <p class="text-gray-400 text-sm">It's quick and easy.</p>
+        <div id="screen-reg" class="screen p-8 flex flex-col justify-center min-h-screen">
+            
+            <div class="mb-8">
+                <button onclick="switchScreen('screen-login')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition mb-6">
+                    <i class="fa-solid fa-arrow-left text-white"></i>
+                </button>
+                <h2 class="text-3xl font-bold text-white">Create Identity</h2>
+                <p class="text-gray-400 text-sm mt-1">Set up your secure digital finance hub.</p>
             </div>
 
-            <div class="space-y-3 bg-[#242526] p-4 rounded-xl border border-[#3e4042]">
-                <div class="flex gap-2">
-                    <input type="text" id="reg-fname" placeholder="First Name" class="fb-input w-1/2">
-                    <input type="text" id="reg-lname" placeholder="Last Name" class="fb-input w-1/2">
+            <div class="space-y-4">
+                <div class="flex gap-3">
+                    <div class="wallet-input-group mb-0 w-1/2">
+                        <input type="text" id="reg-fname" placeholder="First Name" class="wallet-input" style="padding-left: 16px;">
+                    </div>
+                    <div class="wallet-input-group mb-0 w-1/2">
+                        <input type="text" id="reg-lname" placeholder="Last Name" class="wallet-input" style="padding-left: 16px;">
+                    </div>
                 </div>
-                <input type="email" id="reg-email" placeholder="Mobile number or email" class="fb-input">
-                <input type="password" id="reg-pass" placeholder="New password" class="fb-input">
+                
+                <div class="wallet-input-group">
+                    <input type="email" id="reg-email" placeholder="Email Address" class="wallet-input">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                </div>
+
+                <div class="wallet-input-group">
+                    <input type="password" id="reg-pass" placeholder="Create Password" class="wallet-input">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                    <i class="fa-solid fa-circle-info text-indigo-400"></i>
+                    <p class="text-xs text-indigo-200">Your data is stored locally and encrypted.</p>
+                </div>
             </div>
 
-            <div class="mt-6 text-center space-y-4">
-                <button onclick="handleRegister()" class="fb-btn-green w-full">Sign Up</button>
-                <p class="text-[#2d88ff] text-sm cursor-pointer hover:underline" onclick="switchScreen('screen-login')">Already have an account?</p>
-            </div>
+            <button onclick="handleRegister()" class="btn-primary mt-8">
+                Generate Wallet ID
+            </button>
         </div>
 
-        <div id="screen-dash" class="screen pb-20 bg-[#18191a]">
-            
-            <div class="px-5 pt-6 pb-4 flex justify-between items-center bg-[#242526] sticky top-0 z-20 border-b border-[#3e4042]">
+        <div id="screen-dash" class="screen pb-24">
+            <div class="px-6 pt-8 pb-4 flex justify-between items-center bg-[#0b0c15]/80 backdrop-blur sticky top-0 z-20 border-b border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#3a3b3c] flex items-center justify-center font-bold text-white border border-[#3e4042]" id="user-avatar">U</div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20" id="user-avatar">U</div>
                     <div>
-                        <p class="text-[10px] text-gray-400 uppercase">Wallet Active</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Wallet Active</p>
                         <p id="user-name-display" class="font-bold text-white text-sm">USER</p>
                     </div>
                 </div>
-                <button onclick="handleLogout()" class="w-10 h-10 rounded-full bg-[#3a3b3c] flex items-center justify-center text-white hover:bg-[#4e4f50]">
-                    <i class="fa-solid fa-right-from-bracket"></i>
+                <button onclick="handleLogout()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-red-500/20 hover:text-red-500 transition">
+                    <i class="fa-solid fa-power-off"></i>
                 </button>
             </div>
 
-            <div class="px-5 mt-6">
-                <div class="glass-card aspect-[1.58/1] w-full p-6 flex flex-col justify-between relative">
-                    <div class="flex justify-between items-start z-10">
-                        <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
-                        <i class="fa-brands fa-cc-visa text-3xl text-white/80"></i>
-                    </div>
+            <div class="px-6 mt-8">
+                <div class="relative w-full aspect-[1.58/1] rounded-3xl overflow-hidden shadow-2xl shadow-indigo-900/40 group transition-transform duration-500 hover:scale-[1.02]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#0f172a]"></div>
+                    <div class="absolute inset-0 opacity-30" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/30 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/30 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10 p-6 h-full flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="font-extrabold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
+                            <i class="fa-brands fa-cc-visa text-3xl text-white/80"></i>
+                        </div>
 
-                    <div class="w-12 h-9 bg-[#d4af37]/20 border border-[#d4af37] rounded-md z-10 relative mt-2">
-                        <div class="absolute inset-0 grid grid-cols-2">
-                            <div class="border-r border-[#d4af37]/50"></div>
-                            <div class="border-l border-[#d4af37]/50"></div>
+                        <div class="flex items-center gap-4 mt-2">
+                            <div class="w-12 h-9 bg-yellow-400/20 border border-yellow-400/40 rounded-md relative overflow-hidden">
+                                <div class="absolute inset-0 grid grid-cols-2"><div class="border-r border-yellow-400/30"></div></div>
+                                <div class="absolute inset-0 grid grid-rows-2"><div class="border-b border-yellow-400/30"></div></div>
+                            </div>
+                            <i class="fa-solid fa-wifi text-white/50 rotate-90"></i>
+                        </div>
+
+                        <div class="mt-4">
+                             <div class="flex items-center justify-between">
+                                <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">Loading...</p>
+                                <button onclick="copyText('card-num')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white hover:text-indigo-900 transition"><i class="fa-regular fa-copy text-xs"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[9px] text-gray-300 uppercase tracking-widest mb-1">Card Holder</p>
+                                <p id="card-holder" class="font-mono-tech text-sm uppercase text-white font-bold truncate max-w-[160px]">NAME</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] text-gray-300 uppercase tracking-widest mb-1">Expires</p>
+                                <p id="card-exp" class="font-mono-tech text-sm font-bold text-white">00/00</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="z-10 mt-2">
-                        <div class="flex justify-between items-center">
-                            <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">Loading...</p>
-                            <button onclick="copyText('card-num')" class="text-gray-400 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                </div>
+            </div>
+            
+            <div class="px-6 mt-4">
+                <div class="bg-[#1e293b]/50 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                            <i class="fa-solid fa-lock text-xs"></i>
                         </div>
-                    </div>
-
-                    <div class="flex justify-between items-end z-10">
                         <div>
-                            <p class="text-[9px] text-gray-400 uppercase">Holder</p>
-                            <p id="card-holder" class="font-mono-tech text-sm uppercase text-white font-bold truncate max-w-[150px]">NAME</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] text-gray-400 uppercase">EXP</p>
-                            <p id="card-exp" class="font-mono-tech text-sm font-bold text-white">00/00</p>
-                        </div>
-                        <div class="text-right ml-4">
-                            <p class="text-[9px] text-gray-400 uppercase">CVV</p>
-                            <p id="card-cvv" class="font-mono-tech text-sm font-bold text-yellow-500">000</p>
+                            <p class="text-xs text-gray-400 uppercase">CVV Security Code</p>
+                            <p id="card-cvv" class="font-mono-tech text-lg font-bold text-white tracking-widest">•••</p>
                         </div>
                     </div>
+                    <button onclick="toggleCVV()" class="text-xs font-bold text-indigo-400 hover:text-white transition">REVEAL</button>
                 </div>
             </div>
 
-            <div class="px-5 mt-6 grid grid-cols-2 gap-3">
-                <button onclick="regenerateCard()" class="bg-[#242526] border border-[#3e4042] text-white py-3 rounded-lg font-semibold hover:bg-[#3a3b3c]">
-                    <i class="fa-solid fa-arrows-rotate mr-2 text-blue-500"></i> New Card
+            <div class="px-6 mt-6 grid grid-cols-2 gap-3">
+                <button onclick="regenerateCard()" class="bg-[#1e293b] border border-white/5 text-white py-4 rounded-xl font-semibold hover:bg-[#334155] transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate text-indigo-400"></i> New Card
                 </button>
-                <button onclick="copyAllIdentity()" class="bg-[#242526] border border-[#3e4042] text-white py-3 rounded-lg font-semibold hover:bg-[#3a3b3c]">
-                    <i class="fa-solid fa-address-card mr-2 text-green-500"></i> Copy All
+                <button onclick="copyAllIdentity()" class="bg-[#1e293b] border border-white/5 text-white py-4 rounded-xl font-semibold hover:bg-[#334155] transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-clone text-emerald-400"></i> Copy All
                 </button>
             </div>
 
-            <div class="px-5 mt-8">
-                <h3 class="text-gray-400 text-xs font-bold uppercase mb-3 ml-1">Community & Support</h3>
-                <div class="bg-[#242526] rounded-xl border border-[#3e4042] overflow-hidden">
-                    <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="flex items-center justify-between p-4 border-b border-[#3e4042] hover:bg-[#3a3b3c] transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-code"></i></div>
-                            <div><p class="text-sm font-bold text-white">Designer Profile</p><p class="text-xs text-gray-500">Dhumketu Community</p></div>
+             <div class="px-6 mt-8">
+                <h3 class="text-gray-500 text-xs font-bold uppercase mb-4 ml-1 tracking-widest">Community Hub</h3>
+                <div class="space-y-3">
+                    <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="block bg-[#1e293b]/40 border border-white/5 p-4 rounded-2xl hover:bg-[#1e293b] transition group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition"><i class="fa-solid fa-code"></i></div>
+                                <div><p class="font-bold text-sm text-white">Designer</p><p class="text-xs text-gray-400">Dhumketu Community</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white transition"></i>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-500"></i>
                     </a>
-                    <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="flex items-center justify-between p-4 border-b border-[#3e4042] hover:bg-[#3a3b3c] transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-people-group"></i></div>
-                            <div><p class="text-sm font-bold text-white">Official Team</p><p class="text-xs text-gray-500">Cyber 24 Agency</p></div>
+                    <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="block bg-[#1e293b]/40 border border-white/5 p-4 rounded-2xl hover:bg-[#1e293b] transition group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-500 group-hover:bg-purple-600 group-hover:text-white transition"><i class="fa-solid fa-shield-cat"></i></div>
+                                <div><p class="font-bold text-sm text-white">Official Team</p><p class="text-xs text-gray-400">Cyber 24 Agency</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white transition"></i>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-500"></i>
                     </a>
-                    <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="flex items-center justify-between p-4 hover:bg-[#3a3b3c] transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-users"></i></div>
-                            <div><p class="text-sm font-bold text-white">Join Our Group</p><p class="text-xs text-gray-500">Get Updates & Help</p></div>
+                    <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="block bg-[#1e293b]/40 border border-white/5 p-4 rounded-2xl hover:bg-[#1e293b] transition group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-600/20 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-600 group-hover:text-white transition"><i class="fa-solid fa-users"></i></div>
+                                <div><p class="font-bold text-sm text-white">Community Group</p><p class="text-xs text-gray-400">Join the discussion</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white transition"></i>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-500"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="px-5 mt-6 mb-6">
-                <div class="bg-[#242526] p-4 rounded-xl border border-[#3e4042]">
-                     <h3 class="text-gray-400 text-xs font-bold uppercase mb-2">Generated Identity</h3>
-                     <p class="text-sm text-gray-300 font-mono-tech" id="full-id-text">Loading...</p>
+            <div class="px-6 mt-8 mb-4">
+                <div class="bg-gradient-to-r from-[#1e293b] to-[#0f172a] p-5 rounded-2xl border border-white/5">
+                     <h3 class="text-gray-400 text-xs font-bold uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-database"></i> Generated Identity</h3>
+                     <p class="text-sm text-gray-300 font-mono-tech leading-relaxed" id="full-id-text">Loading...</p>
                 </div>
             </div>
-        </div>
 
-        <div class="fixed bottom-0 w-full max-w-md bg-[#242526] z-50">
-            <div class="marquee-container">
-                <span class="marquee-text">🚀 নতুন কিছু আসবে ইনশাআল্লাহ | Stay tuned for upcoming premium features! | Powered by RAFI PAY System.</span>
-            </div>
         </div>
     </div>
 
     <script>
-        // --- SECURE ENCRYPTED ADMIN LIST (Base64 Encoded) ---
-        // সাধারণ মানুষ কোড ওপেন করলে শুধু এই হিজিবিজি লেখা দেখবে।
-        // তারা আসল ইমেইল বা পাসওয়ার্ড দেখতে পাবে না।
+        // --- dk (Base64) ---
         const SECURE_VAULT = [
             { e: "YWRtaW4xQHJhZmkuY29t", p: "cmFmaTEwMQ==", n: "Admin One" },
             { e: "YWRtaW4yQHJhZmkuY29t", p: "cmFmaTEwMg==", n: "Admin Two" },
@@ -245,25 +291,37 @@
         ];
 
         // --- CORE LOGIC ---
-        const DB_KEY = 'rafi_fb_users';
+        const DB_KEY = 'rafi_wallet_v3';
         let currentUser = null;
+        let showCVV = false;
 
         function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
         function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
         
-        function showToast(msg, type='success') {
+        function showToast(title, msg, type='success') {
             const t = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
             document.getElementById('toast-msg').innerText = msg;
-            document.getElementById('toast-icon').className = type === 'error' ? 'text-red-500 text-lg' : 'text-green-500 text-lg';
-            document.getElementById('toast-icon').innerText = type === 'error' ? '✖' : '✓';
+            
+            const iconBg = document.getElementById('toast-icon-bg');
+            const icon = document.getElementById('toast-icon');
+            
+            if(type === 'error') {
+                iconBg.className = "w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0";
+                icon.className = "fa-solid fa-xmark text-red-500";
+            } else {
+                iconBg.className = "w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0";
+                icon.className = "fa-solid fa-check text-green-500";
+            }
+
             t.style.top = "20px";
-            setTimeout(() => t.style.top = "-100px", 2500);
+            setTimeout(() => t.style.top = "-100px", 3000);
         }
 
         function switchScreen(id) {
             document.querySelectorAll('.screen').forEach(s => {
                 s.classList.remove('active-screen');
-                setTimeout(() => { if(!s.classList.contains('active-screen')) s.style.display = 'none'; }, 300);
+                setTimeout(() => { if(!s.classList.contains('active-screen')) s.style.display = 'none'; }, 400);
             });
             const target = document.getElementById(id);
             target.style.display = 'block';
@@ -275,12 +333,10 @@
             const email = document.getElementById('login-email').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
 
-            if(!email || !pass) { showToast("Enter email & password", "error"); return; }
+            if(!email || !pass) { showToast("Error", "Please enter email & password", "error"); return; }
 
-            // 1. Check Decrypted Admin List
-            // atob() function decrypts the Base64 string to check credentials
+            // 1. Check Admin
             const admin = SECURE_VAULT.find(a => atob(a.e) === email && atob(a.p) === pass);
-            
             if(admin) {
                 const db = getDB();
                 if(!db[email]) {
@@ -291,12 +347,12 @@
                 return;
             }
 
-            // 2. Check Regular Users
+            // 2. Check User
             const db = getDB();
             if(db[email] && db[email].pass === pass) {
                 loginUser(email, db[email]);
             } else {
-                showToast("Incorrect email or password", "error");
+                showToast("Access Denied", "Incorrect credentials", "error");
             }
         }
 
@@ -304,7 +360,7 @@
             currentUser = { email, ...userData };
             loadDashboard();
             switchScreen('screen-dash');
-            showToast("Login Successful");
+            showToast("Welcome Back", "Wallet unlocked successfully");
         }
 
         function handleRegister() {
@@ -314,16 +370,16 @@
             const pass = document.getElementById('reg-pass').value.trim();
             const fullName = `${fname} ${lname}`;
 
-            if(!fname || !email || !pass) { showToast("All fields required", "error"); return; }
+            if(!fname || !email || !pass) { showToast("Error", "All fields are required", "error"); return; }
 
             const db = getDB();
-            if(db[email]) { showToast("Email already taken", "error"); return; }
+            if(db[email]) { showToast("Error", "Email already exists", "error"); return; }
 
             const cardData = generateRandomCardData(fullName);
             db[email] = { name: fullName, pass, card: cardData };
             saveDB(db);
 
-            showToast("Account Created!");
+            showToast("Account Created", "Please login with your new credentials");
             document.getElementById('login-email').value = email;
             switchScreen('screen-login');
         }
@@ -334,7 +390,7 @@
             switchScreen('screen-login');
         }
 
-        // --- CARD GENERATOR ---
+        // --- CARD LOGIC ---
         function generateRandomCardData(name) {
             const bin = "4" + Math.floor(Math.random() * 90000 + 10000); 
             let num = bin; while(num.length < 15) num += Math.floor(Math.random()*10);
@@ -347,10 +403,10 @@
                 holder: name.toUpperCase(),
                 exp: `0${Math.floor(Math.random()*9)+1}/${Math.floor(Math.random()*5)+26}`,
                 cvv: Math.floor(Math.random()*899+100),
-                address: `${Math.floor(Math.random()*999)} ${['Main','Park','Fifth'][Math.floor(Math.random()*3)]} Ave`,
-                city: ['NY', 'CA', 'FL'][Math.floor(Math.random()*3)],
+                address: `${Math.floor(Math.random()*999)} ${['Main','Park','Fifth','Elm'][Math.floor(Math.random()*4)]} Ave`,
+                city: ['New York', 'Los Angeles', 'Chicago', 'Miami'][Math.floor(Math.random()*4)],
                 zip: Math.floor(Math.random()*80000+10000),
-                alias: `${name.split(' ')[0].toLowerCase()}${Math.floor(Math.random()*99)}@gmail.com`
+                alias: `${name.split(' ')[0].toLowerCase()}${Math.floor(Math.random()*99)}@mail.com`
             };
         }
 
@@ -362,7 +418,7 @@
             saveDB(db);
             currentUser.card = newData;
             loadDashboard();
-            showToast("New Card Generated");
+            showToast("Updated", "New card generated");
         }
 
         function loadDashboard() {
@@ -370,22 +426,38 @@
             const c = currentUser.card;
             document.getElementById('user-name-display').innerText = currentUser.name;
             document.getElementById('user-avatar').innerText = currentUser.name[0].toUpperCase();
+            
             document.getElementById('card-num').innerText = c.number.match(/.{1,4}/g).join(' ');
             document.getElementById('card-holder').innerText = c.holder;
             document.getElementById('card-exp').innerText = c.exp;
-            document.getElementById('card-cvv').innerText = c.cvv;
-            document.getElementById('full-id-text').innerHTML = `<span class="text-blue-400">Street:</span> ${c.address}<br><span class="text-blue-400">City/Zip:</span> ${c.city}, ${c.zip}<br><span class="text-blue-400">Email:</span> ${c.alias}`;
+            
+            // CVV Logic
+            showCVV = false;
+            document.getElementById('card-cvv').innerText = "•••";
+
+            document.getElementById('full-id-text').innerHTML = `
+                <span class="text-indigo-400">Address:</span> ${c.address}<br>
+                <span class="text-indigo-400">City:</span> ${c.city} ${c.zip}<br>
+                <span class="text-indigo-400">Secure Email:</span> ${c.alias}
+            `;
+        }
+
+        function toggleCVV() {
+            showCVV = !showCVV;
+            const el = document.getElementById('card-cvv');
+            if(showCVV) el.innerText = currentUser.card.cvv;
+            else el.innerText = "•••";
         }
 
         function copyText(id) {
             let txt = document.getElementById(id).innerText.replace(/\s/g, '');
-            navigator.clipboard.writeText(txt).then(() => showToast("Copied!"));
+            navigator.clipboard.writeText(txt).then(() => showToast("Copied", "Card number copied to clipboard"));
         }
 
         function copyAllIdentity() {
             const c = currentUser.card;
             const data = `CARD: ${c.number}\nEXP: ${c.exp} CVV: ${c.cvv}\nNAME: ${c.holder}\nADDR: ${c.address}, ${c.city} ${c.zip}\nEMAIL: ${c.alias}`;
-            navigator.clipboard.writeText(data).then(() => showToast("Full Info Copied!"));
+            navigator.clipboard.writeText(data).then(() => showToast("Copied", "Full identity saved to clipboard"));
         }
     </script>
 </body>
