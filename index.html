@@ -2,312 +2,353 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rafi Card Tools Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RAFI SUITE - Professional Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        mono: ['Share Tech Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0a0e17',
+                            panel: '#111827',
+                            blue: '#1e40af',
+                            accent: '#3b82f6',
+                            glow: '#60a5fa'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .font-ocr { font-family: 'Share Tech Mono', monospace; }
-        .font-brand { font-family: 'Orbitron', sans-serif; }
+        body { background-color: #05070a; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0e17; }
+        ::-webkit-scrollbar-thumb { background: #1e40af; border-radius: 4px; }
         
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Real Card Gradient & Texture */
-        .real-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
-            box-shadow: 0 20px 60px -15px rgba(0,0,0,0.8);
-            border: 1px solid rgba(255,255,255,0.1);
+        /* THE REALISTIC CARD STYLE */
+        .rafi-card-premium {
+            /* Deep Blue Metallic Gradient */
+            background: linear-gradient(110deg, #1e3a8a 0%, #172554 40%, #1e40af 100%);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5), /* Deep shadow */
+                inset 0 1px 1px rgba(255, 255, 255, 0.1); /* Subtle top light edge */
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
         }
-        /* Holographic Shine */
-        .real-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 200%; height: 100%;
-            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.1) 45%, transparent 60%);
-            transition: all 0.5s;
-            pointer-events: none;
+        .rafi-card-premium::before {
+            /* Subtle texture overlay */
+            content: ""; position: absolute; inset: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHZpZXdCb3g9IjAgMCA0IDQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMTcyNTU0IiBmaWxsLW9wYWNpdHk9IjAuMTUiLz4KPHBhdGggZD0iTTAgMmg0TTIgMGwyIDRNMiA0bDItNCIgc3RHJva2U9IiMxZTRMGFmIiBzdHJva2Utb3BhY2l0eT0iMC4wNSIgc3Ryb2r2LXdpZHRoPSIwLjUiLz4KPC9zdmc+');
+            opacity: 0.5; mix-blend-mode: overlay;
         }
-        .real-card:hover::before {
-            left: 100%;
-            transition: 0.7s;
+        .card-chip {
+            background: linear-gradient(135deg, #d4af37, #f9eba7, #b38f2f);
+            border-radius: 6px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
         }
-        
-        /* Gold Chip Effect */
-        .chip {
-            background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            border-radius: 5px;
-            position: relative;
-            overflow: hidden;
-        }
-        .chip::after {
-            content: '';
-            position: absolute;
-            left: 0; top: 50%; width: 100%; height: 1px; background: rgba(0,0,0,0.3);
-        }
-        .chip::before {
-            content: '';
-            position: absolute;
-            left: 30%; top: 0; width: 1px; height: 100%; background: rgba(0,0,0,0.3);
+        .engraved-text {
+            text-shadow: 0 1px 1px rgba(0,0,0,0.5);
         }
     </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+<body class="text-slate-300 h-screen flex overflow-hidden font-sans antialiased">
 
-    <div class="w-full max-w-3xl bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 p-6 md:p-8">
-        
-        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-white">RAFI <span class="text-indigo-500">TOOLS</span></h1>
-                <p class="text-slate-500 text-xs uppercase tracking-widest">Premium Card Generator Suite</p>
+    <aside class="w-20 md:w-64 bg-brand-dark border-r border-slate-800 flex-shrink-0 flex flex-col transition-all">
+        <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-slate-800">
+            <div class="w-10 h-10 bg-gradient-to-tr from-brand-blue to-brand-accent rounded-xl flex items-center justify-center shadow-lg shadow-brand-blue/30">
+                <span class="text-white font-bold text-xl">R</span>
             </div>
-            <div class="text-right hidden md:block">
-                <span class="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                <span class="text-xs text-slate-400 ml-1">System Online</span>
-            </div>
-        </header>
-
-        <div id="main-menu" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 fade-in">
-            <button onclick="showTool('card-generator')" class="col-span-2 md:col-span-2 h-40 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-800 hover:scale-[1.02] transition-transform shadow-lg relative overflow-hidden group border border-blue-500/30">
-                <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition"></div>
-                <div class="relative z-10 flex flex-col items-center justify-center h-full">
-                    <span class="text-5xl mb-2">💳</span>
-                    <span class="font-bold text-xl text-white">GENERATE CARD</span>
-                    <span class="text-xs text-blue-200 mt-1">Get Number, CVV & Address</span>
-                </div>
-            </button>
-
-            <button onclick="showTool('bin-checker')" class="h-40 rounded-2xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-center justify-center group">
-                <span class="text-3xl mb-2 group-hover:scale-110 transition">🔍</span>
-                <span class="font-bold text-slate-300">BIN Check</span>
-            </button>
-
-            <button onclick="showTool('luhn-checker')" class="h-40 rounded-2xl bg-slate-800 hover:bg-slate-700 transition border border-slate-700 flex flex-col items-center justify-center group">
-                <span class="text-3xl mb-2 group-hover:scale-110 transition">✅</span>
-                <span class="font-bold text-slate-300">Validator</span>
-            </button>
+            <span class="ml-3 font-extrabold text-xl text-white hidden md:block tracking-wider">RAFI<span class="text-brand-accent">SUITE</span></span>
         </div>
 
-        <div id="card-generator" class="hidden fade-in">
-            <div class="flex flex-col md:flex-row gap-8">
-                
-                <div class="w-full md:w-1/2 flex justify-center">
-                    <div class="real-card w-full aspect-[1.586/1] rounded-xl p-6 text-white flex flex-col justify-between select-none">
-                        
-                        <div class="flex justify-between items-start">
-                            <span class="font-brand text-xs tracking-[0.2em] text-slate-400">WORLD CLASS</span>
-                            <svg class="w-8 h-8 text-slate-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
-                        </div>
+        <nav class="flex-1 py-6 space-y-2 px-2 md:px-4">
+            <a href="#" onclick="switchTab('dash-view', this)" class="nav-item active flex items-center p-3 bg-brand-blue/20 text-brand-accent rounded-xl transition-all group">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <span class="ml-4 font-semibold hidden md:block">Generator Hub</span>
+            </a>
+            <a href="#" onclick="switchTab('tools-view', this)" class="nav-item flex items-center p-3 text-slate-400 hover:bg-brand-panel hover:text-slate-200 rounded-xl transition-all group">
+                <svg class="w-6 h-6 group-hover:text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="ml-4 font-semibold hidden md:block">Validators</span>
+            </a>
+        </nav>
 
-                        <div class="w-12 h-9 chip my-2 border border-yellow-600/50"></div>
+        <div class="p-4 hidden md:block">
+             <div class="bg-brand-panel rounded-xl p-3 border border-slate-800 flex items-center overflow-hidden relative">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-3"></div>
+                <span class="text-xs text-slate-400 font-mono">SYSTEM SECURE</span>
+                <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-brand-accent/20 blur-xl rounded-full"></div>
+             </div>
+        </div>
+    </aside>
 
-                        <div class="mt-2">
-                            <p id="card-num-display" class="font-ocr text-2xl md:text-3xl tracking-widest drop-shadow-md text-slate-100">
-                                4000 0000 0000 0000
-                            </p>
-                            <div class="flex gap-2 items-center mt-1">
-                                <span class="text-[0.5rem] uppercase text-slate-400">1234</span>
-                            </div>
-                        </div>
 
-                        <div class="flex justify-between items-end mt-4">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[0.4rem] text-slate-300 uppercase">Valid<br>Thru</span>
-                                    <span id="card-exp-display" class="font-ocr text-lg">12/28</span>
-                                </div>
-                                <p id="card-name-display" class="font-ocr text-sm uppercase tracking-widest text-slate-200">MR RAFIUL ISLAM</p>
+    <main class="flex-1 overflow-y-auto bg-[#0a0e17] relative">
+        <div class="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-brand-blue/10 to-transparent pointer-events-none"></div>
+        <div class="absolute top-20 right-20 w-64 h-64 bg-brand-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-6xl mx-auto p-6 md:p-10 relative z-10">
+            
+            <div id="dash-view" class="tab-content animate-fade-in">
+                <header class="mb-8">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Identity Generator</h1>
+                    <p class="text-slate-400 mt-2">Create virtual payment details and social identities.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <div class="lg:col-span-5 flex flex-col items-center justify-start">
+                        <div class="rafi-card-premium w-full aspect-[1.586/1] max-w-[450px] p-6 md:p-8 flex flex-col justify-between select-none hover:scale-[1.01]">
+                            <div class="flex justify-between items-start relative z-10">
+                                <span class="font-extrabold tracking-widest text-sm text-blue-200/60">WORLD ELITE</span>
+                                <svg class="w-8 h-8 text-blue-200/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
                             </div>
                             
-                            <div class="flex flex-col items-end">
-                                <h2 class="font-brand text-2xl font-bold italic bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">RAFI</h2>
-                                <span class="text-[0.6rem] font-bold tracking-widest text-white uppercase italic">CARD</span>
+                            <div class="relative z-10 -mt-4">
+                                <div class="w-14 h-11 card-chip mb-5 relative overflow-hidden border border-yellow-600/40">
+                                    <div class="absolute top-1/2 w-full h-[1px] bg-black/20"></div>
+                                    <div class="absolute left-1/3 h-full w-[1px] bg-black/20"></div>
+                                    <div class="absolute right-1/3 h-full w-[1px] bg-black/20"></div>
+                                </div>
+                                <p id="card-num" class="font-mono text-2xl md:text-[1.7rem] tracking-wider text-white engraved-text drop-shadow-lg">4921 0000 0000 0000</p>
+                            </div>
+
+                            <div class="flex justify-between items-end relative z-10">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-[0.5rem] text-blue-200 uppercase leading-tight">Valid<br>Thru</span>
+                                        <span id="card-exp" class="font-mono text-lg text-white engraved-text">12/29</span>
+                                    </div>
+                                    <p id="card-name" class="font-mono text-sm uppercase tracking-widest text-blue-100 engraved-text">MR RAFIUL ISLAM</p>
+                                </div>
+                                <div class="text-right">
+                                    <h2 class="text-2xl font-extrabold italic text-white leading-none tracking-tighter" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">RAFI</h2>
+                                    <span class="text-[0.65rem] font-bold tracking-[0.3em] text-brand-accent uppercase ">CARD</span>
+                                </div>
+                            </div>
+                        </div> <div class="w-full max-w-[450px] mt-6 bg-brand-panel p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-500 uppercase font-bold">Security Code (CVV)</span>
+                                <p id="card-cvv" class="text-xl font-mono text-brand-accent font-bold tracking-widest">•••</p>
+                            </div>
+                            <button onclick="revealCVV()" class="text-sm text-slate-400 hover:text-white underline">Reveal</button>
+                        </div>
+
+                        <button onclick="generateAll()" class="w-full max-w-[450px] mt-6 bg-gradient-to-r from-brand-blue to-brand-accent hover:from-brand-accent hover:to-brand-blue text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-blue/30 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                            <svg class="w-6 h-6 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <span class="tracking-wider">GENERATE NEW ASSETS</span>
+                        </button>
+                    </div>
+
+
+                    <div class="lg:col-span-7 space-y-6">
+                        
+                        <div class="bg-brand-panel rounded-2xl border border-slate-800 overflow-hidden relative group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-brand-blue"></div>
+                            <div class="p-5 border-b border-slate-800/50 flex justify-between items-center">
+                                <h3 class="font-bold text-white flex items-center gap-2"><span class="text-brand-accent">📍</span> Billing Address</h3>
+                            </div>
+                            <div class="p-5 font-mono text-sm space-y-1 text-slate-300">
+                                <p id="addr-street" class="text-white text-base">Generating...</p>
+                                <p><span id="addr-city">---</span>, <span id="addr-state">--</span> <span id="addr-zip">-----</span></p>
+                                <p class="text-slate-500">United States</p>
                             </div>
                         </div>
+
+                         <div class="bg-brand-panel rounded-2xl border border-slate-800 overflow-hidden relative group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                            <div class="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/10 blur-2xl rounded-full group-hover:bg-purple-500/20 transition"></div>
+                            
+                            <div class="p-5 border-b border-slate-800/50">
+                                <h3 class="font-bold text-white flex items-center gap-2"><span class="text-purple-400">🌐</span> Virtual Social Identity</h3>
+                                <p class="text-xs text-slate-500 mt-1">Credentials for virtual accounts.</p>
+                            </div>
+                            
+                            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <span class="text-xs text-slate-500 uppercase font-bold block mb-2">Username Handle</span>
+                                    <div class="bg-brand-dark p-3 rounded-lg border border-slate-700 flex justify-between items-center">
+                                        <span id="soc-user" class="font-mono text-purple-300 break-all">---</span>
+                                        <button onclick="copyTxt('soc-user')" class="text-slate-500 hover:text-white px-2">📋</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-xs text-slate-500 uppercase font-bold block mb-2">Strong Password</span>
+                                    <div class="bg-brand-dark p-3 rounded-lg border border-slate-700 flex justify-between items-center">
+                                        <span id="soc-pass" class="font-mono text-purple-300 filter blur-[3px] hover:blur-none transition-all cursor-pointer select-all">••••••••••••</span>
+                                        <button onclick="copyTxt('soc-pass')" class="text-slate-500 hover:text-white px-2">📋</button>
+                                    </div>
+                                </div>
+                                 <div class="md:col-span-2">
+                                    <span class="text-xs text-slate-500 uppercase font-bold block mb-2">Alias Email</span>
+                                    <div class="bg-brand-dark p-3 rounded-lg border border-slate-700 flex justify-between items-center">
+                                        <span id="soc-email" class="font-mono text-slate-300 break-all">---@email.com</span>
+                                        <button onclick="copyTxt('soc-email')" class="text-slate-500 hover:text-white px-2">📋</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <button onclick="copyAllData()" class="w-full bg-brand-panel hover:bg-slate-800 text-slate-300 font-semibold py-3 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                            📋 Copy All Generated Details to Clipboard
+                        </button>
                     </div>
                 </div>
-
-                <div class="w-full md:w-1/2 space-y-4">
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                        <h3 class="text-slate-400 text-xs uppercase tracking-widest mb-3 border-b border-slate-700 pb-2">Billing Address</h3>
-                        <div class="space-y-1 font-mono text-sm text-green-400">
-                            <p id="addr-street">123 Random St</p>
-                            <p><span id="addr-city">New York</span>, <span id="addr-state">NY</span> <span id="addr-zip">10001</span></p>
-                            <p class="text-slate-500">United States</p>
+            </div> <div id="tools-view" class="tab-content hidden animate-fade-in">
+                 <header class="mb-8">
+                    <h1 class="text-3xl font-extrabold text-white">Validators & Utilities</h1>
+                    <p class="text-slate-400 mt-2">Check existing card numbers and BINs.</p>
+                </header>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-brand-panel p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">🔍 BIN Database Lookup</h3>
+                        <input type="text" id="bin-in" maxlength="8" class="w-full bg-brand-dark border border-slate-700 rounded-xl p-4 text-white font-mono text-lg focus:border-brand-accent outline-none transition" placeholder="Enter first 6-8 digits">
+                        <button onclick="doBinCheck()" class="mt-4 w-full bg-brand-blue hover:bg-brand-accent text-white font-bold py-3 rounded-xl transition">Search</button>
+                        <div id="bin-out" class="mt-6 min-h-[100px] p-4 bg-brand-dark rounded-xl border border-slate-700 text-slate-400 text-sm">
+                            Results will appear here.
                         </div>
                     </div>
-
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
-                        <div>
-                            <p class="text-slate-400 text-xs uppercase">CVV / CVC</p>
-                            <p id="card-cvv-display" class="text-xl font-mono text-red-400 font-bold">123</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-slate-400 text-xs uppercase">Status</p>
-                            <p class="text-green-500 text-sm font-bold">● Active</p>
-                        </div>
-                    </div>
-
-                    <button onclick="generateFullIdentity()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transition flex items-center justify-center gap-2">
-                        <span>↻</span> Generate New Identity
-                    </button>
                     
-                    <button onclick="copyAllData()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg text-sm transition">
-                        Copy All Details
-                    </button>
+                    <div class="bg-brand-panel p-6 rounded-2xl border border-slate-800">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">✅ Luhn Checksum Validator</h3>
+                        <input type="text" id="luhn-in" class="w-full bg-brand-dark border border-slate-700 rounded-xl p-4 text-white font-mono text-lg focus:border-brand-accent outline-none transition" placeholder="Paste full card number">
+                        <button onclick="doLuhnCheck()" class="mt-4 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition">Validate Number</button>
+                        <div id="luhn-out" class="hidden mt-6 p-4 rounded-xl border font-bold text-center transition-all"></div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <button onclick="goBack()" class="text-slate-500 hover:text-white text-sm">← Back to Main Menu</button>
-            </div>
-        </div>
-
-        <div id="bin-checker" class="hidden fade-in text-center max-w-md mx-auto">
-            <h2 class="text-xl font-bold text-slate-200 mb-4">BIN Lookup</h2>
-            <input type="text" id="bin-input" maxlength="6" class="w-full bg-slate-800 border border-slate-600 p-3 rounded text-center text-xl text-white mb-4" placeholder="First 6 Digits">
-            <button onclick="checkBIN()" class="w-full bg-indigo-600 py-3 rounded font-bold mb-4">Search Database</button>
-            <div id="bin-result" class="text-slate-400 text-sm min-h-[50px]"></div>
-            <button onclick="goBack()" class="mt-4 text-slate-500 hover:text-white">Back</button>
-        </div>
-
-        <div id="luhn-checker" class="hidden fade-in text-center max-w-md mx-auto">
-            <h2 class="text-xl font-bold text-slate-200 mb-4">Luhn Algorithm Check</h2>
-            <input type="text" id="luhn-input" class="w-full bg-slate-800 border border-slate-600 p-3 rounded text-center text-xl text-white mb-4" placeholder="Enter Full Card Number">
-            <button onclick="validateLuhn()" class="w-full bg-green-600 py-3 rounded font-bold mb-4">Validate Checksum</button>
-            <div id="luhn-result" class="hidden p-3 rounded text-center font-bold"></div>
-            <button onclick="goBack()" class="mt-4 text-slate-500 hover:text-white">Back</button>
-        </div>
-
-    </div>
+            </div> </div>
+    </main>
 
     <script>
-        // --- DATA SETS FOR RANDOM ADDRESS ---
-        const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Rafi", "Rahim", "Karim"];
-        const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Islam", "Ahmed"];
-        const streets = ["Maple Ave", "Oak Street", "Washington Blvd", "Lakeview Dr", "Cedar Lane", "Park Road", "Sunset Blvd", "Broadway"];
+        // --- DATASETS ---
+        const namesF = ["James","John","Robert","Michael","William","David","Richard","Rafi","Rahim","Karim"];
+        const namesL = ["Smith","Johnson","Williams","Brown","Jones","Islam","Ahmed","Rahman"];
         const cities = [
-            { name: "New York", state: "NY", zip: "10001" },
-            { name: "Los Angeles", state: "CA", zip: "90001" },
-            { name: "Chicago", state: "IL", zip: "60601" },
-            { name: "Houston", state: "TX", zip: "77001" },
-            { name: "Miami", state: "FL", zip: "33101" },
-            { name: "Seattle", state: "WA", zip: "98101" }
+            {n:"New York",s:"NY",z:"10001"}, {n:"Los Angeles",s:"CA",z:"90012"},
+            {n:"Chicago",s:"IL",z:"60601"}, {n:"Houston",s:"TX",z:"77002"},
+            {n:"Miami",s:"FL",z:"33101"}, {n:"Seattle",s:"WA",z:"98101"}
         ];
+        const streets = ["Park Ave","Oak St","Main St","Cedar Ln","Sunset Blvd","Broadway"];
+        // Social Data
+        const adj = ["Cyber","Digital","Nifty","Blue","Rapid","Hyper","Stealth","Crypto"];
+        const nouns = ["Ninja","Ghost","User","Shadow","Link","Wave","Byte","Surfer"];
+
+        let currentCVV = "000";
+        let currentPass = "";
 
         // --- CORE FUNCTIONS ---
-        
-        function showTool(id) {
-            document.getElementById('main-menu').classList.add('hidden');
-            ['card-generator', 'bin-checker', 'luhn-checker'].forEach(t => document.getElementById(t).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'card-generator') generateFullIdentity();
+        function switchTab(viewId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-brand-blue/20', 'text-brand-accent');
+                el.classList.add('text-slate-400');
+            });
+            btn.classList.add('active', 'bg-brand-blue/20', 'text-brand-accent');
+            btn.classList.remove('text-slate-400');
         }
 
-        function goBack() {
-            ['card-generator', 'bin-checker', 'luhn-checker'].forEach(t => document.getElementById(t).classList.add('hidden'));
-            document.getElementById('main-menu').classList.remove('hidden');
-        }
+        function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function rNum(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-        // --- GENERATOR LOGIC ---
-        function generateFullIdentity() {
-            // 1. Generate Luhn Valid Number (Start with 4 for Rafi Card/Visa base)
-            let bin = "4" + Math.floor(Math.random() * 90000 + 10000); 
-            let num = bin;
-            while(num.length < 15) num += Math.floor(Math.random()*10);
+        // --- GENERATORS ---
+        function generateAll() {
+            // 1. Card
+            let bin = "4921" + rNum(1000,9999); // World Elite like bin
+            let num = bin; while(num.length<15) num += rNum(0,9);
+            let sum=0, d=false;
+            for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
+            num += (sum*9)%10;
             
-            // Calculate Check Digit
-            let sum = 0;
-            for(let i=0; i<num.length; i++) {
-                let digit = parseInt(num[num.length-1-i]);
-                if(i%2==0) { digit*=2; if(digit>9) digit-=9; }
-                sum+=digit;
-            }
-            let checkDigit = (sum*9)%10;
-            let fullNum = num + checkDigit;
+            let expM = rNum(1,12).toString().padStart(2,'0');
+            let expY = (new Date().getFullYear() + rNum(2,5)).toString().slice(-2);
+            currentCVV = rNum(100,999).toString();
+            let fName = rnd(namesF); let lName = rnd(namesL); let fullName = (fName+" "+lName).toUpperCase();
 
-            // 2. Generate Date
-            let year = new Date().getFullYear() + Math.floor(Math.random()*4) + 1;
-            let month = Math.floor(Math.random()*12) + 1;
-            if(month<10) month = '0'+month;
-            
-            // 3. Generate CVV
-            let cvv = Math.floor(Math.random()*899)+100;
+            // 2. Address
+            let city = rnd(cities);
+            let street = rNum(100,9990) + " " + rnd(streets);
 
-            // 4. Generate Name & Address
-            let fname = firstNames[Math.floor(Math.random()*firstNames.length)];
-            let lname = lastNames[Math.floor(Math.random()*lastNames.length)];
-            let fullName = (fname + " " + lname).toUpperCase();
-            
-            let streetNum = Math.floor(Math.random()*9000)+100;
-            let streetName = streets[Math.floor(Math.random()*streets.length)];
-            let cityData = cities[Math.floor(Math.random()*cities.length)];
+            // 3. Social Identity
+            let username = (rnd(adj) + rnd(nouns) + rNum(10,99)).toLowerCase();
+            let email = username + "@" + rnd(["gmail.com","outlook.com","proton.me"]);
+            currentPass = Array(16).fill("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*")
+                .map(function(x) { return x[Math.floor(Math.random() * x.length)] }).join('');
 
             // --- UPDATE UI ---
-            // Format number with spaces
-            document.getElementById('card-num-display').innerText = fullNum.match(/.{1,4}/g).join(' ');
-            document.getElementById('card-exp-display').innerText = `${month}/${year.toString().slice(-2)}`;
-            document.getElementById('card-name-display').innerText = fullName;
-            document.getElementById('card-cvv-display').innerText = cvv;
-            
-            // Address UI
-            document.getElementById('addr-street').innerText = `${streetNum} ${streetName}`;
-            document.getElementById('addr-city').innerText = cityData.name;
-            document.getElementById('addr-state').innerText = cityData.state;
-            document.getElementById('addr-zip').innerText = cityData.zip;
+            document.getElementById('card-num').innerText = num.match(/.{1,4}/g).join(' ');
+            document.getElementById('card-exp').innerText = `${expM}/${expY}`;
+            document.getElementById('card-name').innerText = fullName;
+            document.getElementById('card-cvv').innerText = "•••"; // Hide initially
 
-            // Save for copy
-            window.generatedData = `Card: ${fullNum}\nExp: ${month}/${year.toString().slice(-2)} CVV: ${cvv}\nName: ${fullName}\nAddress: ${streetNum} ${streetName}, ${cityData.name}, ${cityData.state} ${cityData.zip}, USA`;
+            document.getElementById('addr-street').innerText = street;
+            document.getElementById('addr-city').innerText = city.n;
+            document.getElementById('addr-state').innerText = city.s;
+            document.getElementById('addr-zip').innerText = city.z;
+
+            document.getElementById('soc-user').innerText = username;
+            document.getElementById('soc-email').innerText = email;
+            document.getElementById('soc-pass').innerText = "••••••••••••"; // Hide pass visually
+        }
+
+        function revealCVV() {
+            let el = document.getElementById('card-cvv');
+            el.innerText = el.innerText === "•••" ? currentCVV : "•••";
+        }
+
+        function copyTxt(id) {
+            let txt = id === 'soc-pass' ? currentPass : document.getElementById(id).innerText;
+            if(txt === "---" || txt === "") return;
+            navigator.clipboard.writeText(txt);
+            // Simple feedback (optional flash)
+            document.getElementById(id).classList.add('text-brand-accent');
+            setTimeout(()=> document.getElementById(id).classList.remove('text-brand-accent'), 200);
         }
 
         function copyAllData() {
-            navigator.clipboard.writeText(window.generatedData).then(() => {
-                alert("All Identity Details Copied to Clipboard!");
-            });
+            const num = document.getElementById('card-num').innerText;
+            if(num.includes("0000")) { alert("Generate first!"); return; }
+            let data = `=== RAFI SUITE ASSETS ===\nCARD: ${num}\nEXP: ${document.getElementById('card-exp').innerText} | CVV: ${currentCVV}\nNAME: ${document.getElementById('card-name').innerText}\n\nADDRESS:\n${document.getElementById('addr-street').innerText}\n${document.getElementById('addr-city').innerText}, ${document.getElementById('addr-state').innerText} ${document.getElementById('addr-zip').innerText}\n\nSOCIAL ID:\nUser: ${document.getElementById('soc-user').innerText}\nPass: ${currentPass}\nEmail: ${document.getElementById('soc-email').innerText}`;
+            navigator.clipboard.writeText(data).then(()=> alert("All details copied to clipboard!"));
         }
 
-        // --- VALIDATOR & BIN LOGIC ---
-        function validateLuhn() {
-            let val = document.getElementById('luhn-input').value.replace(/\D/g,'');
-            let res = document.getElementById('luhn-result');
-            res.classList.remove('hidden');
-            
-            if(val.length < 13) {
-                res.innerHTML = "❌ Too Short"; res.className = "text-red-400 bg-red-900/50 p-2 rounded block"; return;
-            }
-            
+        // --- VALIDATORS ---
+        function doLuhnCheck() {
+            let val = document.getElementById('luhn-in').value.replace(/\D/g,'');
+            let out = document.getElementById('luhn-out');
+            out.classList.remove('hidden');
+            if(val.length<13){ out.innerHTML="❌ Too short"; out.className="mt-6 p-4 rounded-xl border font-bold text-center bg-red-900/30 border-red-500 text-red-400"; return; }
             let sum=0, d=false;
-            for(let i=val.length-1; i>=0; i--){
-                let n = parseInt(val.charAt(i));
-                if(d) { if((n*=2)>9) n-=9; }
-                sum+=n; d=!d;
-            }
-            if((sum%10)===0) {
-                res.innerHTML = "✅ Valid Number"; res.className = "text-green-400 bg-green-900/50 p-2 rounded block";
-            } else {
-                res.innerHTML = "❌ Invalid Checksum"; res.className = "text-red-400 bg-red-900/50 p-2 rounded block";
-            }
+            for(let i=val.length-1; i>=0; i--){ let n=parseInt(val[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d;}
+            if(sum%10===0) { out.innerHTML="✅ Valid Checksum"; out.className="mt-6 p-4 rounded-xl border font-bold text-center bg-green-900/30 border-green-500 text-green-400"; }
+            else { out.innerHTML="❌ Invalid Checksum"; out.className="mt-6 p-4 rounded-xl border font-bold text-center bg-red-900/30 border-red-500 text-red-400"; }
         }
 
-        async function checkBIN() {
-            let bin = document.getElementById('bin-input').value;
-            let res = document.getElementById('bin-result');
-            if(bin.length<6) { res.innerText="Enter 6 digits"; return; }
-            res.innerText = "Searching...";
+        async function doBinCheck() {
+            let bin = document.getElementById('bin-in').value;
+            let out = document.getElementById('bin-out');
+            if(bin.length<6){ out.innerText="Please enter at least 6 digits."; return;}
+            out.innerHTML = '<span class="animate-pulse">Searching database...</span>';
             try {
                 let r = await fetch(`https://lookup.binlist.net/${bin}`);
+                if(!r.ok) throw new Error();
                 let d = await r.json();
-                res.innerHTML = `Bank: <span class="text-white">${d.bank?.name || 'N/A'}</span><br>Type: ${d.type} | ${d.scheme}`;
-            } catch(e) {
-                res.innerHTML = "Offline/No Data Found.";
-            }
+                out.innerHTML = `<div class="space-y-2"><p>🏦 <span class="text-white font-bold">${d.bank?.name || 'Unknown Bank'}</span></p><p>💳 ${d.scheme?.toUpperCase()} | ${d.type?.toUpperCase()} | ${d.brand || ''}</p><p>🌍 ${d.country?.name || 'N/A'} ${d.country?.emoji || ''}</p></div>`;
+            } catch(e) { out.innerHTML = "<span class='text-yellow-500'>Offline or Not Found.</span>"; }
         }
+
+        // Init
+        generateAll();
     </script>
 </body>
 </html>
