@@ -3,205 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rafi Pay - Live BIN Wallet</title>
+    <title>RAFI PAY - Persistent Wallet</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background: #050505; color: white; overflow-x: hidden; }
-        .font-mono-tech { font-family: 'Rajdhani', monospace; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #020202; color: white; overflow-x: hidden; }
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         
-        /* Smooth Transitions */
+        /* Smooth Screen Transitions */
         .screen {
-            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            transition: all 0.4s ease-in-out;
-            opacity: 0; pointer-events: none; transform: scale(0.95);
+            position: absolute; width: 100%; min-height: 100vh; top: 0; left: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 0; pointer-events: none; transform: scale(0.98); display: none;
         }
-        .active-screen { opacity: 1; pointer-events: all; transform: scale(1); z-index: 10; }
+        .active-screen { opacity: 1; pointer-events: all; transform: scale(1); display: block; z-index: 10; }
 
-        /* REALISTIC GLASS CARD */
+        /* GLASS CARD (Premium Look) */
         .glass-card {
-            background: linear-gradient(135deg, rgba(29, 78, 216, 0.8), rgba(147, 51, 234, 0.8));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.5);
-            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(20, 20, 25, 0.9), rgba(10, 10, 12, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border-radius: 24px; position: relative; overflow: hidden;
         }
         .glass-card::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at 30% 0%, rgba(255,255,255,0.2), transparent 40%);
-            border-radius: 20px; pointer-events: none;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+            pointer-events: none;
         }
+        
+        /* Input Fields */
+        .input-box {
+            background: #0f0f11; border: 1px solid #27272a; color: white;
+            border-radius: 12px; padding: 16px; width: 100%; transition: all 0.3s;
+        }
+        .input-box:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); outline: none; }
 
-        /* Animations */
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-        .btn-pulse:active { animation: pulse-border 0.5s; }
+        /* Neon Text */
+        .text-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
-<body class="flex justify-center h-screen bg-black">
+<body class="bg-black text-gray-200">
 
-    <div class="w-full max-w-md h-full relative bg-[#0a0a0a] shadow-2xl overflow-hidden flex flex-col">
+    <div class="w-full max-w-md mx-auto min-h-screen relative bg-[#050505] shadow-2xl overflow-hidden flex flex-col">
 
-        <div id="toast" class="fixed top-[-100px] left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 text-white px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 transition-all duration-300">
-            <span class="text-green-400 text-xl">✓</span>
-            <span id="toast-msg" class="text-sm font-bold tracking-wide">Action Successful</span>
+        <div id="toast" class="fixed top-[-100px] left-1/2 -translate-x-1/2 bg-gray-800 border border-gray-700 px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 transition-all duration-300">
+            <span id="toast-icon" class="text-green-400 text-lg">✓</span>
+            <span id="toast-msg" class="text-sm font-bold">Success</span>
         </div>
 
-        <div id="screen-reg" class="screen active-screen flex flex-col justify-center px-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-            <div class="mb-10 text-center">
-                <h1 class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600 mb-2">RAFI PAY</h1>
-                <p class="text-gray-400">Secure Virtual BIN Wallet</p>
-            </div>
-            
-            <div class="space-y-5">
-                <div>
-                    <label class="text-gray-500 text-xs uppercase tracking-widest ml-2">Display Name</label>
-                    <input type="text" id="reg-name" placeholder="YOUR NAME" class="w-full bg-[#111] border border-gray-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition uppercase font-mono-tech text-lg">
+        <div id="screen-reg" class="screen active-screen p-8 flex flex-col justify-center">
+            <div class="text-center mb-10">
+                <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
+                    <span class="text-4xl">💎</span>
                 </div>
-                <div>
-                    <label class="text-gray-500 text-xs uppercase tracking-widest ml-2">Email ID</label>
-                    <input type="email" id="reg-email" placeholder="email@server.com" class="w-full bg-[#111] border border-gray-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition">
-                </div>
-                <div>
-                    <label class="text-gray-500 text-xs uppercase tracking-widest ml-2">Master Key</label>
-                    <input type="password" id="reg-pass" placeholder="••••••••" class="w-full bg-[#111] border border-gray-800 rounded-xl p-4 text-white focus:border-blue-500 outline-none transition">
-                </div>
-            </div>
-
-            <button onclick="doRegister()" class="mt-8 w-full bg-gradient-to-r from-blue-600 to-purple-600 py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-900/40 btn-pulse">CREATE ACCOUNT</button>
-        </div>
-
-        <div id="screen-login" class="screen flex flex-col justify-center px-8">
-            <div class="text-center mb-12">
-                <div class="w-24 h-24 bg-blue-900/20 rounded-full mx-auto flex items-center justify-center border border-blue-500/30 mb-4 animate-pulse">
-                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h2 class="text-2xl font-bold">Welcome Back</h2>
-                <button id="auto-fill-btn" class="mt-4 px-4 py-2 bg-gray-800 rounded-full text-xs text-blue-300 border border-gray-700 hidden">
-                    Tap to autofill: <span id="saved-email-display"></span>
-                </button>
+                <h1 class="text-4xl font-bold text-white mb-2">RAFI PAY</h1>
+                <p class="text-gray-500 text-sm">Create your persistent identity.</p>
             </div>
 
             <div class="space-y-4">
-                <input type="email" id="login-email" placeholder="Email" class="w-full bg-[#111] border border-gray-800 rounded-xl p-4 text-white">
-                <input type="password" id="login-pass" placeholder="Password" class="w-full bg-[#111] border border-gray-800 rounded-xl p-4 text-white">
+                <input type="text" id="reg-name" placeholder="Full Name" class="input-box">
+                <input type="email" id="reg-email" placeholder="Email Address" class="input-box">
+                <input type="password" id="reg-pass" placeholder="Password" class="input-box">
             </div>
 
-            <button onclick="doLogin()" class="mt-8 w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg transition">LOGIN TO DASHBOARD</button>
+            <button onclick="handleRegister()" class="mt-8 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-blue-900/30">
+                Create Secure Wallet
+            </button>
+            <p class="text-center mt-6 text-gray-500 text-sm cursor-pointer hover:text-white" onclick="switchScreen('screen-login')">Already have an account? Login</p>
         </div>
 
-        <div id="screen-dash" class="screen bg-[#050505] overflow-y-auto pb-24">
+        <div id="screen-login" class="screen p-8 flex flex-col justify-center">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white">Welcome Back</h2>
+                <p class="text-gray-500 text-sm mt-2">Access your saved cards.</p>
+            </div>
+
+            <div class="space-y-4">
+                <input type="email" id="login-email" placeholder="Email" class="input-box">
+                <input type="password" id="login-pass" placeholder="Password" class="input-box">
+            </div>
+
+            <button onclick="handleLogin()" class="mt-8 w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 text-white font-bold py-4 rounded-xl transition">
+                Unlock Dashboard
+            </button>
+            <p class="text-center mt-6 text-gray-500 text-sm cursor-pointer hover:text-white" onclick="switchScreen('screen-reg')">Create new account</p>
+        </div>
+
+        <div id="screen-dash" class="screen pb-24">
             
-            <div class="p-6 flex justify-between items-center sticky top-0 bg-[#050505]/90 backdrop-blur-md z-20 border-b border-gray-900">
-                <div>
-                    <p class="text-gray-400 text-xs">Welcome,</p>
-                    <p id="dash-username" class="font-bold text-xl uppercase tracking-wide text-white">USER</p>
+            <div class="px-6 pt-8 pb-4 flex justify-between items-center bg-[#050505]/80 backdrop-blur sticky top-0 z-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center font-bold text-blue-400 border border-gray-700" id="user-avatar">U</div>
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Wallet ID</p>
+                        <p id="user-name-display" class="font-bold text-white text-sm">USER</p>
+                    </div>
                 </div>
-                <button onclick="toggleNotifs()" class="relative p-2 bg-gray-900 rounded-full border border-gray-700 hover:bg-gray-800 transition">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
-                    <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                <button onclick="handleLogout()" class="text-gray-500 hover:text-red-400 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </button>
             </div>
 
-            <div id="notif-panel" class="hidden mx-6 bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 animate-bounce-in">
-                <h4 class="text-gray-500 text-xs uppercase mb-3 border-b border-gray-800 pb-2">Notifications</h4>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <p class="text-sm">New BIN Card Generated successfully.</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <p class="text-sm">Account login from Android Device.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="px-6 mt-4">
-                <div class="glass-card aspect-[1.58/1] w-full p-6 flex flex-col justify-between relative overflow-hidden group">
+            <div class="px-6 mt-2 perspective-1000">
+                <div class="glass-card aspect-[1.58/1] w-full p-6 flex flex-col justify-between relative group hover:scale-[1.01] transition-transform duration-500">
                     
-                    <div class="absolute top-[-50px] right-[-50px] w-32 h-32 bg-purple-500/30 rounded-full blur-2xl"></div>
-                    <div class="absolute bottom-[-50px] left-[-50px] w-32 h-32 bg-blue-500/30 rounded-full blur-2xl"></div>
+                    <div class="absolute right-0 top-0 w-48 h-48 bg-purple-600/20 blur-3xl rounded-full"></div>
+                    <div class="absolute left-0 bottom-0 w-32 h-32 bg-blue-600/20 blur-3xl rounded-full"></div>
 
                     <div class="flex justify-between items-start z-10">
-                        <h3 class="font-bold text-2xl italic tracking-tighter text-white drop-shadow-md">RAFI CARD</h3>
-                        <svg class="w-8 h-8 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
-                    </div>
-
-                    <div class="z-10 mt-2">
-                         <div class="flex items-center gap-2 mb-2">
-                             <div class="w-10 h-8 bg-yellow-500/20 border border-yellow-500 rounded flex items-center justify-center">
-                                 <div class="w-6 h-4 border border-yellow-500/50"></div>
-                             </div>
-                             <span class="text-xs text-gray-300">Debit</span>
-                         </div>
-
-                         <div class="flex items-center justify-between bg-black/20 rounded-lg p-2 border border-white/10 backdrop-blur-sm">
-                             <p id="card-num-live" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white font-bold drop-shadow-sm truncate">Loading...</p>
-                             <button onclick="copyCardNum()" class="p-2 hover:bg-white/10 rounded-full transition active:scale-90">
-                                 <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                             </button>
-                         </div>
-                    </div>
-
-                    <div class="flex justify-between items-end z-10 mt-2">
-                        <div>
-                            <p class="text-[10px] text-gray-300 uppercase tracking-widest">Card Holder</p>
-                            <p id="card-holder-live" class="font-mono-tech text-lg sm:text-xl font-bold uppercase text-white tracking-wider truncate max-w-[150px]">NAME</p>
+                        <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
+                        <div class="w-8 h-8 opacity-80 text-white">
+                            <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
                         </div>
-                        <div class="text-right">
-                             <div class="flex gap-4">
-                                <div>
-                                    <p class="text-[9px] text-gray-300 uppercase">EXP</p>
-                                    <p id="card-exp-live" class="font-mono-tech text-lg font-bold">MM/YY</p>
-                                </div>
-                                <div>
-                                    <p class="text-[9px] text-gray-300 uppercase">CVV</p>
-                                    <p id="card-cvv-live" class="font-mono-tech text-lg font-bold text-yellow-400">000</p>
-                                </div>
-                             </div>
+                    </div>
+
+                    <div class="w-12 h-9 bg-yellow-500/10 border border-yellow-500/50 rounded-md backdrop-blur-sm z-10 relative overflow-hidden">
+                        <div class="absolute top-1/2 w-full h-[1px] bg-yellow-500/30"></div>
+                        <div class="absolute left-1/3 h-full w-[1px] bg-yellow-500/30"></div>
+                        <div class="absolute right-1/3 h-full w-[1px] bg-yellow-500/30"></div>
+                    </div>
+
+                    <div class="z-10 mt-2 flex justify-between items-center">
+                        <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white text-glow drop-shadow-md">Loading...</p>
+                        <button onclick="copyText('card-num')" class="text-gray-400 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                    </div>
+
+                    <div class="flex justify-between items-end z-10">
+                        <div>
+                            <p class="text-[9px] text-gray-400 uppercase tracking-widest">Card Holder</p>
+                            <p id="card-holder" class="font-mono-tech text-sm uppercase text-white font-bold truncate max-w-[150px]">NAME</p>
+                        </div>
+                        <div class="text-right flex gap-3">
+                            <div>
+                                <p class="text-[9px] text-gray-400 uppercase">EXP</p>
+                                <p id="card-exp" class="font-mono-tech text-sm font-bold">00/00</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 uppercase">CVV</p>
+                                <p id="card-cvv" class="font-mono-tech text-sm font-bold text-yellow-400">000</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-3 px-6 mt-6">
-                <button class="flex flex-col items-center gap-2 p-3 bg-gray-900 rounded-2xl border border-gray-800 active:bg-gray-800">
-                    <span class="text-2xl">💸</span> <span class="text-[10px] text-gray-400">Transfer</span>
+            <div class="px-6 mt-6 flex gap-3">
+                <button onclick="openEditModal()" class="flex-1 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-white py-3 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2">
+                    <span>✏️</span> Edit Card
                 </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-gray-900 rounded-2xl border border-gray-800 active:bg-gray-800">
-                    <span class="text-2xl">📥</span> <span class="text-[10px] text-gray-400">Top Up</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-gray-900 rounded-2xl border border-gray-800 active:bg-gray-800">
-                    <span class="text-2xl">❄️</span> <span class="text-[10px] text-gray-400">Freeze</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-gray-900 rounded-2xl border border-gray-800 active:bg-gray-800">
-                    <span class="text-2xl">⚙️</span> <span class="text-[10px] text-gray-400">Settings</span>
+                <button onclick="regenerateCard()" class="flex-1 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-white py-3 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2">
+                    <span>🔄</span> Random New
                 </button>
             </div>
 
             <div class="px-6 mt-8">
-                <h3 class="text-lg font-bold mb-4 flex justify-between">Recent Activity <span class="text-xs text-blue-500 font-normal mt-1 cursor-pointer">View All</span></h3>
-                <div id="tx-list" class="space-y-3">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">🔐 Identity Vault <span class="text-[10px] bg-blue-900 text-blue-300 px-2 py-0.5 rounded">AUTO-GENERATED</span></h3>
+                
+                <div class="bg-[#0f0f11] rounded-2xl border border-gray-800 p-5 space-y-4">
+                    <div class="flex justify-between items-start border-b border-gray-800 pb-3">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Billing Address</p>
+                            <p id="id-address" class="text-sm text-gray-300 font-mono-tech mt-1">Generating...</p>
+                        </div>
+                        <button onclick="copyText('id-address')" class="text-gray-500 hover:text-white">📋</button>
                     </div>
+
+                    <div class="flex justify-between border-b border-gray-800 pb-3">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Zip Code</p>
+                            <p id="id-zip" class="text-sm text-white font-mono-tech">00000</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase text-right">Country</p>
+                            <p class="text-sm text-white font-mono-tech">United States</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Alias Email</p>
+                            <p id="id-email" class="text-sm text-gray-300 font-mono-tech break-all">user@mail.com</p>
+                        </div>
+                        <button onclick="copyText('id-email')" class="text-gray-500 hover:text-white">📋</button>
+                    </div>
+                </div>
+                
+                <button onclick="copyAllIdentity()" class="w-full mt-4 bg-blue-900/30 border border-blue-800/50 text-blue-300 py-3 rounded-xl text-sm font-bold hover:bg-blue-900/50 transition">
+                    Copy Full Identity JSON
+                </button>
+            </div>
+
+        </div>
+
+        <div id="modal-edit" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-6">
+            <div class="bg-[#151518] w-full max-w-sm rounded-2xl border border-gray-700 p-6">
+                <h3 class="text-xl font-bold mb-4">Customize Card</h3>
+                
+                <label class="text-xs text-gray-500 uppercase">Enter First 6 Digits (BIN)</label>
+                <input type="text" id="edit-bin" maxlength="6" class="input-box mb-4 text-center text-xl font-mono-tech tracking-widest" value="453590">
+                
+                <label class="text-xs text-gray-500 uppercase">Card Holder Name</label>
+                <input type="text" id="edit-name" class="input-box mb-6 uppercase" placeholder="NAME ON CARD">
+
+                <div class="flex gap-3">
+                    <button onclick="closeModal()" class="flex-1 bg-gray-800 py-3 rounded-xl">Cancel</button>
+                    <button onclick="saveCustomCard()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold">Save Changes</button>
+                </div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // --- LOGIC SECTION ---
+        // --- LOGIC: LOCAL STORAGE & STATE ---
+        const DB_KEY = 'rafi_pay_users_v2';
+        let currentUser = null;
 
-        let userDetails = { name: "", email: "", pass: "" };
-
-        // 1. UTILS
-        function showToast(msg) {
+        // 1. HELPERS
+        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
+        function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
+        
+        function showToast(msg, type='success') {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
+            document.getElementById('toast-icon').innerText = type === 'error' ? '❌' : '✓';
             t.style.top = "20px";
             setTimeout(() => t.style.top = "-100px", 2500);
         }
@@ -209,130 +235,162 @@
         function switchScreen(id) {
             document.querySelectorAll('.screen').forEach(s => {
                 s.classList.remove('active-screen');
-                s.style.display = 'none'; // hard hide
+                setTimeout(() => { if(!s.classList.contains('active-screen')) s.style.display = 'none'; }, 400);
             });
-            const active = document.getElementById(id);
-            active.style.display = 'flex'; // Reset display type
-            if(id === 'screen-dash') active.style.display = 'block'; // Dash is block
-            
-            setTimeout(() => active.classList.add('active-screen'), 10);
+            const target = document.getElementById(id);
+            target.style.display = 'block';
+            setTimeout(() => target.classList.add('active-screen'), 10);
         }
 
-        // 2. REGISTRATION
-        function doRegister() {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
+        // 2. AUTHENTICATION
+        function handleRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const pass = document.getElementById('reg-pass').value.trim();
 
-            if(!name || !email || !pass) { alert("Please fill all fields!"); return; }
+            if(!name || !email || !pass) { showToast("Fill all fields!", "error"); return; }
 
-            userDetails = { name, email, pass };
-            
-            showToast("Account Saved! Redirecting...");
-            
+            const db = getDB();
+            if(db[email]) { showToast("Email already exists!", "error"); return; }
+
+            // Create New User with a Random Card
+            const cardData = generateRandomCardData(name);
+            db[email] = { name, pass, card: cardData };
+            saveDB(db);
+
+            showToast("Account Created!");
             setTimeout(() => {
-                // Auto-fill logic
-                document.getElementById('saved-email-display').innerText = email;
-                document.getElementById('auto-fill-btn').classList.remove('hidden');
-                document.getElementById('auto-fill-btn').onclick = () => {
-                    document.getElementById('login-email').value = email;
-                    document.getElementById('login-pass').value = pass;
-                };
+                document.getElementById('login-email').value = email;
+                document.getElementById('login-pass').value = pass;
                 switchScreen('screen-login');
-            }, 1500);
+            }, 1000);
         }
 
-        // 3. LOGIN
-        function doLogin() {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
             
-            if(e === userDetails.email && p === userDetails.pass) {
-                initDashboard();
+            const db = getDB();
+            const user = db[email];
+
+            if(user && user.pass === pass) {
+                currentUser = { email, ...user };
+                loadDashboard();
                 switchScreen('screen-dash');
             } else {
-                alert("Wrong credentials! Did you register?");
+                showToast("Invalid Credentials", "error");
             }
         }
 
-        // 4. DASHBOARD & CARD GENERATOR (The Important Part)
-        function initDashboard() {
-            document.getElementById('dash-username').innerText = userDetails.name.split(" ")[0];
-            document.getElementById('card-holder-live').innerText = userDetails.name;
-            
-            // Generate Valid BIN Card
-            const bin = "4" + Math.floor(Math.random() * 90000 + 10000); // 4xxxxx
-            let num = bin;
-            while(num.length < 15) num += Math.floor(Math.random()*10);
-            
-            // Luhn Check Digit
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('login-pass').value = '';
+            switchScreen('screen-login');
+        }
+
+        // 3. CARD LOGIC (Persistent)
+        function generateRandomCardData(ownerName) {
+            // Generate valid card
+            const bin = "4" + Math.floor(Math.random() * 90000 + 10000); 
+            let num = bin; while(num.length < 15) num += Math.floor(Math.random()*10);
+            // Luhn
             let sum=0, d=false;
-            for(let i=num.length-1; i>=0; i--){ 
-                let n=parseInt(num[i]); 
-                if(d){ if((n*=2)>9)n-=9; } 
-                sum+=n; d=!d; 
-            }
-            const checkDigit = (sum*9)%10;
-            const fullCard = num + checkDigit;
+            for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
+            const fullNum = num + ((sum*9)%10);
+
+            return {
+                number: fullNum,
+                holder: ownerName.toUpperCase(),
+                exp: `0${Math.floor(Math.random()*9)+1}/${Math.floor(Math.random()*5)+26}`,
+                cvv: Math.floor(Math.random()*899+100),
+                // Identity Data
+                address: `${Math.floor(Math.random()*9999)} ${['Oak','Pine','Maple','Cedar'][Math.floor(Math.random()*4)]} St`,
+                city: ['New York', 'Miami', 'Austin', 'Seattle'][Math.floor(Math.random()*4)],
+                zip: Math.floor(Math.random()*80000+10000),
+                aliasEmail: `${ownerName.split(' ')[0].toLowerCase()}${Math.floor(Math.random()*99)}@mail.com`
+            };
+        }
+
+        function loadDashboard() {
+            if(!currentUser) return;
+            // Update UI from stored data
+            const c = currentUser.card;
+            document.getElementById('user-name-display').innerText = currentUser.name;
+            document.getElementById('user-avatar').innerText = currentUser.name[0].toUpperCase();
             
-            // Format: xxxx xxxx xxxx xxxx
-            const formatted = fullCard.match(/.{1,4}/g).join(' ');
+            document.getElementById('card-num').innerText = c.number.match(/.{1,4}/g).join(' ');
+            document.getElementById('card-holder').innerText = c.holder;
+            document.getElementById('card-exp').innerText = c.exp;
+            document.getElementById('card-cvv').innerText = c.cvv;
+
+            // Identity UI
+            document.getElementById('id-address').innerText = `${c.address}, ${c.city}`;
+            document.getElementById('id-zip').innerText = c.zip;
+            document.getElementById('id-email').innerText = c.aliasEmail;
+        }
+
+        // 4. CARD ACTIONS (Regenerate / Edit)
+        function updateUserData(newCardData) {
+            const db = getDB();
+            db[currentUser.email].card = newCardData; // Update DB
+            saveDB(db); 
+            currentUser.card = newCardData; // Update Session
+            loadDashboard(); // Refresh UI
+            showToast("Wallet Updated");
+        }
+
+        function regenerateCard() {
+            if(!confirm("Generate new random card? Old data will be lost.")) return;
+            const newData = generateRandomCardData(currentUser.name);
+            updateUserData(newData);
+        }
+
+        // Modal Logic
+        function openEditModal() {
+            document.getElementById('edit-bin').value = currentUser.card.number.substring(0,6);
+            document.getElementById('edit-name').value = currentUser.card.holder;
+            document.getElementById('modal-edit').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('modal-edit').classList.add('hidden'); }
+
+        function saveCustomCard() {
+            let bin = document.getElementById('edit-bin').value.replace(/\D/g,'');
+            if(bin.length < 6) bin = "400000"; // Fallback
             
-            document.getElementById('card-num-live').innerText = formatted;
-            document.getElementById('card-cvv-live').innerText = Math.floor(Math.random() * 899 + 100);
-            document.getElementById('card-exp-live').innerText = `0${Math.floor(Math.random()*9)+1}/${Math.floor(Math.random()*5)+26}`;
-
-            // Generate Transactions
-            generateTransactions();
-        }
-
-        // 5. COPY FUNCTION
-        function copyCardNum() {
-            const num = document.getElementById('card-num-live').innerText.replace(/\s/g, '');
-            navigator.clipboard.writeText(num).then(() => {
-                showToast("Card Number Copied!");
-            });
-        }
-
-        // 6. NOTIFICATIONS
-        function toggleNotifs() {
-            const panel = document.getElementById('notif-panel');
-            panel.classList.toggle('hidden');
-        }
-
-        // 7. DYNAMIC TRANSACTIONS
-        function generateTransactions() {
-            const brands = [
-                {name: "Netflix", icon: "🎬", type: "Subscription"},
-                {name: "Amazon AWS", icon: "☁️", type: "Cloud Services"},
-                {name: "Spotify", icon: "🎵", type: "Music"},
-                {name: "Uber", icon: "🚗", type: "Transport"},
-                {name: "Steam", icon: "🎮", type: "Gaming"},
-                {name: "Apple Store", icon: "🍎", type: "Electronics"}
-            ];
+            // Keep existing identity, just change card info
+            let newData = {...currentUser.card};
             
-            const list = document.getElementById('tx-list');
-            list.innerHTML = ""; // Clear old
-
-            // Pick 3 random
-            for(let i=0; i<4; i++) {
-                const item = brands[Math.floor(Math.random() * brands.length)];
-                const price = (Math.random() * 50 + 5).toFixed(2);
-                
-                const html = `
-                <div class="flex items-center justify-between p-4 bg-gray-900 border border-gray-800 rounded-2xl">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-xl">${item.icon}</div>
-                        <div>
-                            <p class="font-bold text-sm text-white">${item.name}</p>
-                            <p class="text-xs text-gray-500">${item.type}</p>
-                        </div>
-                    </div>
-                    <span class="font-bold text-white">-$${price}</span>
-                </div>`;
-                list.innerHTML += html;
-            }
+            // Generate valid num from BIN
+            let num = bin; while(num.length < 15) num += Math.floor(Math.random()*10);
+            let sum=0, d=false;
+            for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
+            newData.number = num + ((sum*9)%10);
+            
+            newData.holder = document.getElementById('edit-name').value.toUpperCase();
+            
+            updateUserData(newData);
+            closeModal();
         }
+
+        // 5. UTILS
+        function copyText(id) {
+            let txt = document.getElementById(id).innerText;
+            if(id === 'card-num') txt = txt.replace(/\s/g, '');
+            navigator.clipboard.writeText(txt).then(() => showToast("Copied!"));
+        }
+
+        function copyAllIdentity() {
+            const c = currentUser.card;
+            const data = `Name: ${c.holder}\nAddress: ${c.address}, ${c.city} ${c.zip}, USA\nEmail: ${c.aliasEmail}`;
+            navigator.clipboard.writeText(data).then(() => showToast("Identity Copied!"));
+        }
+
+        // Check for existing session
+        // (Optional: You can uncomment this to auto-login the last user)
+        // const db = getDB();
+        // const lastKey = Object.keys(db)[0]; 
+        // if(lastKey) { document.getElementById('login-email').value = lastKey; }
+
     </script>
 </body>
 </html>
