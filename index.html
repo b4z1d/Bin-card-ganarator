@@ -23,7 +23,7 @@
         }
         .glass-input:focus { border-color: #3b82f6; background: rgba(255,255,255,0.08); }
 
-        /* Real Card Design (Front Only) */
+        /* Real Card Design */
         .real-card {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             border-radius: 24px; padding: 24px;
@@ -103,24 +103,20 @@
             <div class="px-6 mt-8">
                 <div class="real-card relative group">
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
-                    
                     <div class="relative z-10 flex justify-between items-start">
                         <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
                         <i class="fa-brands fa-cc-visa text-3xl text-white/90"></i>
                     </div>
-
                     <div class="relative z-10 flex items-center gap-3 mt-4">
                         <div class="chip"></div>
                         <i class="fa-solid fa-wifi rotate-90 text-white/50"></i>
                     </div>
-
                     <div class="relative z-10 mt-4">
                         <div class="flex justify-between items-center">
                             <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">**** **** **** ****</p>
                             <button onclick="copyCardNum()" class="text-white/50 hover:text-white"><i class="fa-regular fa-copy"></i></button>
                         </div>
                     </div>
-
                     <div class="relative z-10 flex justify-between items-end mt-5">
                         <div>
                             <p class="text-[9px] text-gray-300 uppercase tracking-widest">Holder</p>
@@ -148,6 +144,53 @@
                     <i class="fa-solid fa-address-card mr-2"></i> Copy Info
                 </button>
             </div>
+
+            <div class="px-6 mt-8">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 ml-1 tracking-widest">Community & Support</h3>
+                <div class="space-y-3">
+                    
+                    <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-blue-500/30 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-white">Designer Profile</p>
+                                <p class="text-[10px] text-gray-500">Dhumketu Community</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                    </a>
+
+                    <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-purple-500/30 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-white">Team Agency</p>
+                                <p class="text-[10px] text-gray-500">Cyber 24 UnderCover</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                    </a>
+
+                    <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-green-500/30 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-white">Official Group</p>
+                                <p class="text-[10px] text-gray-500">Join Discussion</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                    </a>
+
+                </div>
+            </div>
+
         </div>
 
         <div class="fixed bottom-0 w-full max-w-md bg-[#050505] border-t border-white/10 z-50">
