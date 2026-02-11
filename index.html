@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RAFI PAY - BIN CARD</title>
+    <title>RAFI PAY - Secure Wallet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,65 +11,38 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050505; color: white; overflow-x: hidden; }
         .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         
-        /* Screen Transitions */
         .screen {
             position: absolute; width: 100%; min-height: 100vh; top: 0; left: 0;
             transition: all 0.4s ease; opacity: 0; pointer-events: none; transform: translateY(10px); display: none;
         }
         .active-screen { opacity: 1; pointer-events: all; transform: translateY(0); display: block; z-index: 10; }
 
-        /* --- 3D FLIP CARD STYLES --- */
-        .card-scene { perspective: 1000px; width: 100%; aspect-ratio: 1.58/1; cursor: pointer; }
-        .card-inner {
-            position: relative; width: 100%; height: 100%; text-align: center;
-            transition: transform 0.8s; transform-style: preserve-3d;
-        }
-        .card-scene.is-flipped .card-inner { transform: rotateY(180deg); }
-        
-        .card-face {
-            position: absolute; width: 100%; height: 100%;
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Front Design */
-        .card-front {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-        }
-        .card-front::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.4;
-            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-        }
-
-        /* Back Design */
-        .card-back {
-            background: #1e1b4b; transform: rotateY(180deg);
-            display: flex; flex-direction: column; justify-content: center;
-        }
-        .magnetic-strip { width: 100%; height: 40px; background: #000; margin-top: 20px; }
-        .signature-strip {
-            width: 80%; height: 35px; background: #fff; margin: 15px auto;
-            color: #000; font-family: 'Cursive', serif; line-height: 35px; text-align: left; padding-left: 10px; font-size: 14px;
-        }
-        .cvv-box {
-            position: absolute; right: 15%; top: 43%;
-            width: 50px; height: 30px; border: 2px solid #ef4444; border-radius: 5px;
-            display: flex; items-center justify-content: center; background: white; color: black; font-weight: bold;
-        }
-
-        /* Footer Marquee */
-        .marquee-container { overflow: hidden; white-space: nowrap; background: #111; border-top: 1px solid #333; padding: 10px 0; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; color: #3b82f6; font-size: 0.85rem; }
-        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-
-        /* Glass Input */
         .glass-input {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
             color: white; padding: 14px; border-radius: 12px; width: 100%; outline: none;
         }
-        .glass-input:focus { border-color: #6366f1; background: rgba(255,255,255,0.08); }
+        .glass-input:focus { border-color: #3b82f6; background: rgba(255,255,255,0.08); }
+
+        /* Real Card Design (Front Only) */
+        .real-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-radius: 24px; padding: 24px;
+            box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative; overflow: hidden; aspect-ratio: 1.58/1;
+        }
+        .real-card::before {
+            content: ""; position: absolute; inset: 0; opacity: 0.4;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+        .chip {
+            width: 45px; height: 35px; background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.6); border-radius: 6px; position: relative;
+        }
+
+        .marquee-container { overflow: hidden; white-space: nowrap; background: #111; border-top: 1px solid #333; padding: 10px 0; }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; color: #3b82f6; font-size: 0.85rem; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
     </style>
 </head>
 <body class="bg-[#050505]">
@@ -83,56 +56,44 @@
 
         <div id="screen-login" class="screen active-screen p-8 flex flex-col justify-center min-h-screen pb-20">
             <div class="text-center mb-10">
-                <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6 rotate-6">
-                    <i class="fa-solid fa-shield-halved text-3xl text-white"></i>
+                <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg mb-6 rotate-6">
+                    <i class="fa-solid fa-wallet text-3xl text-white"></i>
                 </div>
-                <h1 class="text-3xl font-extrabold text-white tracking-tight">RAFI PAY</h1>
-                <p class="text-gray-400 text-sm mt-1">Next Gen Secure Wallet</p>
+                <h1 class="text-3xl font-extrabold text-white">RAFI PAY</h1>
+                <p class="text-gray-400 text-sm mt-1">Secure Digital Wallet</p>
             </div>
-
             <div class="space-y-4">
                 <input type="email" id="login-email" placeholder="Email Address" class="glass-input">
                 <input type="password" id="login-pass" placeholder="Password" class="glass-input">
-                <button onclick="handleLogin()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white transition shadow-lg shadow-blue-900/40">
-                    Unlock Wallet
-                </button>
+                <div class="text-right">
+                    <button onclick="handleForgot()" class="text-xs text-blue-400 hover:text-white">Forgot Password?</button>
+                </div>
+                <button onclick="handleLogin()" class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-white transition">Unlock Wallet</button>
             </div>
-
             <div class="mt-8 text-center">
-                <p class="text-gray-500 text-sm">Don't have an account?</p>
-                <button onclick="switchScreen('screen-reg')" class="text-blue-400 font-bold text-sm mt-2 hover:underline">Create ID Now</button>
+                <button onclick="switchScreen('screen-reg')" class="text-gray-400 font-bold text-sm hover:text-white">Create New ID</button>
             </div>
         </div>
 
         <div id="screen-reg" class="screen p-8 flex flex-col justify-center min-h-screen pb-20">
             <div class="mb-8">
                 <button onclick="switchScreen('screen-login')" class="text-gray-400 hover:text-white mb-4"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h2 class="text-3xl font-bold text-white">New Identity</h2>
+                <h2 class="text-3xl font-bold text-white">Register</h2>
             </div>
-
             <div class="space-y-4">
-                <input type="text" id="reg-name" placeholder="Full Name (For Card)" class="glass-input uppercase">
+                <input type="text" id="reg-name" placeholder="Full Name" class="glass-input uppercase">
                 <input type="email" id="reg-email" placeholder="Email Address" class="glass-input">
                 <input type="password" id="reg-pass" placeholder="Set Password" class="glass-input">
-                
-                <div class="bg-blue-900/20 p-4 rounded-xl border border-blue-500/20 flex gap-3 items-start">
-                    <i class="fa-solid fa-circle-info text-blue-400 mt-1"></i>
-                    <p class="text-xs text-blue-200">System will simulate "Save Password" prompt upon registration.</p>
-                </div>
-
-                <button onclick="handleRegister()" class="w-full py-4 rounded-xl bg-green-600 hover:bg-green-500 font-bold text-white transition">
-                    Generate Identity
-                </button>
+                <button onclick="handleRegister()" class="w-full py-4 rounded-xl bg-green-600 hover:bg-green-500 font-bold text-white transition">Create Account</button>
             </div>
         </div>
 
         <div id="screen-dash" class="screen pb-32">
-            
             <div class="px-6 pt-8 pb-4 flex justify-between items-center bg-[#0a0a0a]/90 backdrop-blur sticky top-0 z-20 border-b border-white/5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center font-bold" id="user-avatar">U</div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold" id="user-avatar">U</div>
                     <div>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase">Status: Active</p>
+                        <p class="text-[10px] text-green-400 font-bold uppercase">● Active</p>
                         <p id="user-name-display" class="font-bold text-sm">User</p>
                     </div>
                 </div>
@@ -140,244 +101,65 @@
             </div>
 
             <div class="px-6 mt-8">
-                <div class="card-scene" onclick="this.classList.toggle('is-flipped')">
-                    <div class="card-inner">
-                        
-                        <div class="card-face card-front p-6 flex flex-col justify-between relative">
-                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
-                            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/30 rounded-full blur-3xl"></div>
-                            
-                            <div class="relative z-10 flex justify-between items-start">
-                                <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
-                                <i class="fa-brands fa-cc-visa text-3xl text-white/80"></i>
-                            </div>
+                <div class="real-card relative group">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
+                        <i class="fa-brands fa-cc-visa text-3xl text-white/90"></i>
+                    </div>
 
-                            <div class="relative z-10 flex items-center gap-3 mt-1">
-                                <div class="w-11 h-8 bg-yellow-500/20 border border-yellow-500/50 rounded flex items-center justify-center">
-                                    <i class="fa-solid fa-microchip text-yellow-500/80"></i>
-                                </div>
-                                <i class="fa-solid fa-wifi rotate-90 text-white/50"></i>
-                            </div>
+                    <div class="relative z-10 flex items-center gap-3 mt-4">
+                        <div class="chip"></div>
+                        <i class="fa-solid fa-wifi rotate-90 text-white/50"></i>
+                    </div>
 
-                            <div class="relative z-10 mt-2">
-                                <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">Loading...</p>
-                            </div>
+                    <div class="relative z-10 mt-4">
+                        <div class="flex justify-between items-center">
+                            <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">**** **** **** ****</p>
+                            <button onclick="copyCardNum()" class="text-white/50 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                    </div>
 
-                            <div class="relative z-10 flex justify-between items-end">
-                                <div>
-                                    <p class="text-[8px] text-gray-300 uppercase tracking-widest mb-0.5">Card Holder</p>
-                                    <p id="card-holder" class="font-mono-tech text-sm uppercase font-bold truncate max-w-[150px]">NAME</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[8px] text-gray-300 uppercase tracking-widest mb-0.5">Expires</p>
-                                    <p id="card-exp" class="font-mono-tech text-sm font-bold">00/00</p>
-                                </div>
+                    <div class="relative z-10 flex justify-between items-end mt-5">
+                        <div>
+                            <p class="text-[9px] text-gray-300 uppercase tracking-widest">Holder</p>
+                            <p id="card-holder" class="font-mono-tech text-sm uppercase font-bold truncate max-w-[120px]">NAME</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div>
+                                <p class="text-[9px] text-gray-300 uppercase tracking-widest">Exp</p>
+                                <p id="card-exp" class="font-mono-tech text-sm font-bold">00/00</p>
+                            </div>
+                            <div class="bg-white/10 px-2 py-0.5 rounded border border-white/20">
+                                <p class="text-[7px] text-gray-300 uppercase tracking-widest">CVV</p>
+                                <p id="card-cvv" class="font-mono-tech text-sm font-bold text-yellow-400">000</p>
                             </div>
                         </div>
-
-                        <div class="card-face card-back relative">
-                            <div class="magnetic-strip"></div>
-                            <div class="flex items-center justify-between px-6 mt-4">
-                                <div class="signature-strip">Authorized Signature</div>
-                                <div class="text-black bg-white font-mono-tech font-bold px-2 py-1 rounded border-2 border-red-500 ml-2" id="card-cvv">000</div>
-                            </div>
-                            <div class="px-6 mt-4 text-left">
-                                <p class="text-[8px] text-gray-400">
-                                    This card is issued by RAFI PAY. Misuse is a criminal offense. If found, please return to nearest branch.
-                                </p>
-                                <div class="mt-4 flex justify-end">
-                                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 opacity-50"></div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
-                <p class="text-center text-xs text-gray-500 mt-3 animate-pulse">Tap card to flip & see CVV</p>
             </div>
 
             <div class="px-6 mt-6 grid grid-cols-2 gap-3">
-                <button onclick="copyCardNum()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-blue-400">
-                    <i class="fa-regular fa-copy mr-2"></i> Copy Number
-                </button>
                 <button onclick="regenerateCard()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-purple-400">
                     <i class="fa-solid fa-rotate mr-2"></i> New Card
                 </button>
+                <button onclick="copyAllIdentity()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-green-400">
+                    <i class="fa-solid fa-address-card mr-2"></i> Copy Info
+                </button>
             </div>
-
-            <div class="px-6 mt-8">
-                <h3 class="text-gray-500 text-xs font-bold uppercase mb-3 ml-1">Official Links</h3>
-                <div class="space-y-2">
-                    <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-blue-500/50 transition group">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-brands fa-facebook text-blue-600 text-xl"></i>
-                            <div><p class="text-sm font-bold">Designer</p><p class="text-xs text-gray-500">Dhumketu Community</p></div>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-                    <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-green-500/50 transition group">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-users text-green-600 text-xl"></i>
-                            <div><p class="text-sm font-bold">Official Group</p><p class="text-xs text-gray-500">Join Discussion</p></div>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-                    <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-purple-500/50 transition group">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-user-secret text-purple-600 text-xl"></i>
-                            <div><p class="text-sm font-bold">Team Agency</p><p class="text-xs text-gray-500">Cyber 24 UnderCover</p></div>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-                </div>
-            </div>
-
         </div>
 
         <div class="fixed bottom-0 w-full max-w-md bg-[#050505] border-t border-white/10 z-50">
             <div class="marquee-container">
-                <span class="marquee-text">🚀 নতুন কিছু আসবে ইনশাআল্লাহ | Stay tuned for upcoming premium features! | Powered by RAFI ISLAM.</span>
+                <span id="dynamic-marquee" class="marquee-text">Loading Notice...</span>
             </div>
         </div>
-
     </div>
 
-    <script>
-        // --- SECURE ADMINS (Base64) ---
-        const SECURE_VAULT = [
-            { e: "YWRtaW4xQHJhZmkuY29t", p: "cmFmaTEwMQ==", n: "Admin One" },
-            { e: "ZGV2QHJhZmkuY29t", p: "Y29kZTE=", n: "Developer" }
-            // ... (rest are implied for brevity)
-        ];
+    <script src="admin_data.js"></script>
+    <script src="notice_config.js"></script>
+    <script src="app_core.js"></script>
 
-        // --- STATE ---
-        const DB_KEY = 'rafi_pay_final_v1';
-        let currentUser = null;
-
-        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
-        function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
-
-        function showToast(msg, type='success') {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            const icon = document.getElementById('toast-icon');
-            icon.className = type === 'error' ? 'fa-solid fa-circle-xmark text-red-500' : 'fa-solid fa-circle-check text-green-500';
-            t.style.top = "20px";
-            setTimeout(() => t.style.top = "-100px", 2500);
-        }
-
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.remove('active-screen');
-                setTimeout(() => { if(!s.classList.contains('active-screen')) s.style.display = 'none'; }, 400);
-            });
-            const target = document.getElementById(id);
-            target.style.display = 'block';
-            setTimeout(() => target.classList.add('active-screen'), 10);
-        }
-
-        // --- AUTH LOGIC ---
-        function handleLogin() {
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
-
-            if(!email || !pass) { showToast("Enter credentials", "error"); return; }
-
-            // Admin Check
-            const admin = SECURE_VAULT.find(a => atob(a.e) === email && atob(a.p) === pass);
-            if(admin) {
-                const db = getDB();
-                if(!db[email]) {
-                    db[email] = { name: admin.n, pass: pass, card: generateCard(admin.n) };
-                    saveDB(db);
-                }
-                loginUser(email, db[email]);
-                return;
-            }
-
-            // User Check
-            const db = getDB();
-            if(db[email] && db[email].pass === pass) {
-                loginUser(email, db[email]);
-            } else {
-                showToast("Invalid Login", "error");
-            }
-        }
-
-        function handleRegister() {
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim().toLowerCase();
-            const pass = document.getElementById('reg-pass').value.trim();
-
-            if(!name || !email || !pass) { showToast("All fields required", "error"); return; }
-            
-            const db = getDB();
-            if(db[email]) { showToast("Email exists!", "error"); return; }
-
-            const card = generateCard(name);
-            db[email] = { name, pass, card };
-            saveDB(db);
-
-            showToast("Account Saved! Please Login.");
-            document.getElementById('login-email').value = email;
-            switchScreen('screen-login');
-        }
-
-        function loginUser(email, data) {
-            currentUser = { email, ...data };
-            loadDashboard();
-            switchScreen('screen-dash');
-            showToast("Welcome Back!");
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('login-pass').value = '';
-            switchScreen('screen-login');
-        }
-
-        // --- CARD LOGIC ---
-        function generateCard(name) {
-            const bin = "4" + Math.floor(Math.random() * 90000 + 10000);
-            let num = bin; while(num.length < 15) num += Math.floor(Math.random()*10);
-            let sum=0, d=false;
-            for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
-            const fullNum = num + ((sum*9)%10);
-
-            return {
-                number: fullNum,
-                holder: name.toUpperCase(),
-                exp: `0${Math.floor(Math.random()*9)+1}/${Math.floor(Math.random()*5)+26}`,
-                cvv: Math.floor(Math.random()*899+100)
-            };
-        }
-
-        function loadDashboard() {
-            if(!currentUser) return;
-            const c = currentUser.card;
-            document.getElementById('user-name-display').innerText = currentUser.name;
-            document.getElementById('user-avatar').innerText = currentUser.name[0].toUpperCase();
-            document.getElementById('card-num').innerText = c.number.match(/.{1,4}/g).join(' ');
-            document.getElementById('card-holder').innerText = c.holder;
-            document.getElementById('card-exp').innerText = c.exp;
-            document.getElementById('card-cvv').innerText = c.cvv;
-        }
-
-        function regenerateCard() {
-            if(!confirm("Create new card number?")) return;
-            const newCard = generateCard(currentUser.name);
-            const db = getDB();
-            db[currentUser.email].card = newCard;
-            saveDB(db);
-            currentUser.card = newCard;
-            loadDashboard();
-            showToast("New Card Issued");
-        }
-
-        function copyCardNum() {
-            const txt = document.getElementById('card-num').innerText.replace(/\s/g,'');
-            navigator.clipboard.writeText(txt).then(() => showToast("Number Copied!"));
-        }
-    </script>
 </body>
 </html>
