@@ -1,8 +1,8 @@
 // app_core.js
 
-// --- DATABASE & SESSION CONFIG ---
+// --- DATABASE & SESSION ---
 const DB_KEY = 'rafi_pay_master_v1';
-const SESSION_KEY = 'rafi_pay_active_session'; // সেশন সেভ রাখার চাবি
+const SESSION_KEY = 'rafi_pay_active_session';
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
 function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
@@ -10,7 +10,7 @@ function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
 // --- UTILS ---
 function showToast(msg, type='success') {
     const t = document.getElementById('toast');
-    if(!t) return; // Safety check
+    if(!t) return;
     document.getElementById('toast-msg').innerText = msg;
     const icon = document.getElementById('toast-icon');
     icon.className = type === 'error' ? 'fa-solid fa-circle-xmark text-red-500' : 'fa-solid fa-circle-check text-green-500';
@@ -43,25 +43,19 @@ function switchTab(tabName) {
 // --- CORE FUNCTIONS ---
 let currentUser = null;
 
-// পেজ লোড হলে চেক করবে ইউজার লগইন ছিল কিনা
+// Auto Login on Load
 window.addEventListener('DOMContentLoaded', () => {
     checkSession();
 });
 
 function checkSession() {
     const activeEmail = localStorage.getItem(SESSION_KEY);
-    
     if (activeEmail) {
-        // যদি সেশন থাকে, ডাটাবেস থেকে ইউজার বের করো
         const db = getDB();
         const user = db[activeEmail];
-        
         if (user) {
-            // অটো লগইন
             currentUser = { email: activeEmail, ...user };
             loadDashboard();
-            
-            // সরাসরি ড্যাশবোর্ড দেখাও (এনিমেশন ছাড়া)
             document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
             document.getElementById('screen-dash').style.display = 'block';
             document.getElementById('screen-dash').classList.add('active-screen');
@@ -69,8 +63,6 @@ function checkSession() {
             return;
         }
     }
-    
-    // সেশন না থাকলে লগইন পেজ
     switchScreen('screen-login');
 }
 
@@ -80,7 +72,6 @@ function handleLogin() {
 
     if(!email || !pass) { showToast("Enter credentials", "error"); return; }
 
-    // Admin Check
     const admin = typeof SECURE_VAULT !== 'undefined' ? SECURE_VAULT.find(a => atob(a.e) === email && atob(a.p) === pass) : null;
     
     if(admin) {
@@ -93,7 +84,6 @@ function handleLogin() {
         return;
     }
 
-    // User Check
     const db = getDB();
     if(db[email] && db[email].pass === pass) {
         loginUser(email, db[email]);
@@ -116,9 +106,6 @@ function handleRegister() {
     db[email] = { name, pass, card };
     saveDB(db);
 
-    // রেজিস্ট্রেশনের পর অটো লগইন চাইলে নিচের লাইন আনকমেন্ট করুন
-    // loginUser(email, { name, pass, card });
-    
     showToast("Account Created! Please Login.");
     document.getElementById('login-email').value = email;
     switchScreen('screen-login');
@@ -137,9 +124,7 @@ function handleForgot() {
 }
 
 function loginUser(email, data) {
-    // সেভ সেশন (যাতে রিলোড দিলেও লগইন থাকে)
     localStorage.setItem(SESSION_KEY, email);
-    
     currentUser = { email, ...data };
     loadDashboard();
     switchScreen('screen-dash');
@@ -148,9 +133,7 @@ function loginUser(email, data) {
 }
 
 function handleLogout() {
-    // সেশন ডিলিট করো
     localStorage.removeItem(SESSION_KEY);
-    
     currentUser = null;
     document.getElementById('login-pass').value = '';
     switchScreen('screen-login');
@@ -207,7 +190,7 @@ function copyAllIdentity() {
     navigator.clipboard.writeText(info).then(() => showToast("Info Copied!"));
 }
 
-// --- ADDRESS GENERATOR ---
+// --- ADDRESS GENERATOR (FIXED) ---
 function pasteFromClip() {
     navigator.clipboard.readText().then(text => {
         document.getElementById('paste-card-input').value = text;
@@ -218,8 +201,22 @@ function pasteFromClip() {
 }
 
 function generateBillingAddress() {
-    const input = document.getElementById('paste-card-input').value;
-    if(input.length < 10) { showToast("Invalid Card Number", "error"); return; }
+    // ১. ইনপুট থেকে স্পেস সরিয়ে ফেলা
+    let input = document.getElementById('paste-card-input').value.replace(/\D/g, ''); 
+
+    // ২. যদি ইনপুট খালি থাকে, তাহলে অটোমেটিক ড্যাশবোর্ডের কার্ড নাম্বার নিবে
+    if (input.length === 0 && currentUser && currentUser.card) {
+        input = currentUser.card.number;
+        // ইনপুট বক্সেও দেখাবে
+        document.getElementById('paste-card-input').value = input.match(/.{1,4}/g).join(' ');
+        showToast("Using Active Card!");
+    }
+
+    // ৩. ভ্যালিডেশন চেক (কমপক্ষে ১৩ ডিজিট হতে হবে)
+    if(input.length < 13) { 
+        showToast("Invalid Card Number (Too Short)", "error"); 
+        return; 
+    }
 
     const streets = ["Maple Ave", "Oak St", "Washington Blvd", "Lakeview Dr", "Sunset Blvd", "Broadway", "Highland Park"];
     const cities = [
@@ -242,7 +239,9 @@ function generateBillingAddress() {
     document.getElementById('res-phone').innerText = randomPhone;
 
     document.getElementById('address-result').classList.remove('hidden');
-    showToast("Address Generated!");
+    
+    // Smooth scroll to result
+    document.getElementById('address-result').scrollIntoView({ behavior: 'smooth' });
 }
 
 function copyBilling() {
@@ -254,4 +253,4 @@ function copyBilling() {
     
     const full = `Street: ${s}\nCity: ${c}\nState: ${st}\nZip: ${z}\nPhone: ${p}\nCountry: USA`;
     navigator.clipboard.writeText(full).then(() => showToast("Address Copied!"));
-}
+        }
