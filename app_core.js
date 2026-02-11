@@ -1,8 +1,8 @@
 // app_core.js
 
 // --- DATABASE & SESSION ---
-const DB_KEY = 'rafi_pay_master_v1';
-const SESSION_KEY = 'rafi_pay_active_session';
+const DB_KEY = 'rafi_pay_master_v2';
+const SESSION_KEY = 'rafi_pay_session_v2';
 
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
 function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
@@ -43,7 +43,7 @@ function switchTab(tabName) {
 // --- CORE FUNCTIONS ---
 let currentUser = null;
 
-// Auto Login on Load
+// Auto Login
 window.addEventListener('DOMContentLoaded', () => {
     checkSession();
 });
@@ -139,21 +139,29 @@ function handleLogout() {
     switchScreen('screen-login');
 }
 
-// --- CARD LOGIC ---
+// --- UPDATED CARD GENERATOR ---
 function generateCard(name) {
+    // 1. Generate Mastercard Number (Starts with 51-55)
     const prefix = 51 + Math.floor(Math.random() * 5); 
     let num = prefix.toString(); 
     while(num.length < 15) num += Math.floor(Math.random()*10);
     
+    // Luhn Checksum
     let sum=0, d=false;
     for(let i=num.length-1; i>=0; i--){ let n=parseInt(num[i]); if(d){if((n*=2)>9)n-=9;} sum+=n; d=!d; }
     const fullNum = num + ((sum*9)%10);
 
+    // 2. Generate Valid Future Date
+    const currentYear = new Date().getFullYear() % 100; // e.g., 24
+    const expYear = currentYear + Math.floor(Math.random() * 5) + 1; // 25 to 29
+    let expMonth = Math.floor(Math.random() * 12) + 1; // 1 to 12
+    if(expMonth < 10) expMonth = '0' + expMonth; // Pad with 0
+
     return {
         number: fullNum,
         holder: name.toUpperCase(),
-        exp: `0${Math.floor(Math.random()*9)+1}/${Math.floor(Math.random()*5)+26}`,
-        cvv: Math.floor(Math.random()*899+100)
+        exp: `${expMonth}/${expYear}`,
+        cvv: Math.floor(Math.random() * 899 + 100) // 100 to 999
     };
 }
 
@@ -190,7 +198,7 @@ function copyAllIdentity() {
     navigator.clipboard.writeText(info).then(() => showToast("Info Copied!"));
 }
 
-// --- ADDRESS GENERATOR (FIXED) ---
+// --- ADDRESS GENERATOR ---
 function pasteFromClip() {
     navigator.clipboard.readText().then(text => {
         document.getElementById('paste-card-input').value = text;
@@ -201,20 +209,17 @@ function pasteFromClip() {
 }
 
 function generateBillingAddress() {
-    // ১. ইনপুট থেকে স্পেস সরিয়ে ফেলা
     let input = document.getElementById('paste-card-input').value.replace(/\D/g, ''); 
 
-    // ২. যদি ইনপুট খালি থাকে, তাহলে অটোমেটিক ড্যাশবোর্ডের কার্ড নাম্বার নিবে
+    // Auto-fill from dashboard if empty
     if (input.length === 0 && currentUser && currentUser.card) {
         input = currentUser.card.number;
-        // ইনপুট বক্সেও দেখাবে
         document.getElementById('paste-card-input').value = input.match(/.{1,4}/g).join(' ');
         showToast("Using Active Card!");
     }
 
-    // ৩. ভ্যালিডেশন চেক (কমপক্ষে ১৩ ডিজিট হতে হবে)
     if(input.length < 13) { 
-        showToast("Invalid Card Number (Too Short)", "error"); 
+        showToast("Invalid Card Number", "error"); 
         return; 
     }
 
@@ -239,8 +244,6 @@ function generateBillingAddress() {
     document.getElementById('res-phone').innerText = randomPhone;
 
     document.getElementById('address-result').classList.remove('hidden');
-    
-    // Smooth scroll to result
     document.getElementById('address-result').scrollIntoView({ behavior: 'smooth' });
 }
 
