@@ -40,6 +40,11 @@
             border: 1px solid rgba(255, 215, 0, 0.6); border-radius: 6px; position: relative;
         }
 
+        /* Nav Bar */
+        .nav-btn { color: #6b7280; display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 4px; }
+        .nav-btn.active { color: #3b82f6; }
+        .nav-btn i { font-size: 20px; }
+
         .marquee-container { overflow: hidden; white-space: nowrap; background: #111; border-top: 1px solid #333; padding: 10px 0; }
         .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; color: #3b82f6; font-size: 0.85rem; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
@@ -89,6 +94,7 @@
         </div>
 
         <div id="screen-dash" class="screen pb-32">
+            
             <div class="px-6 pt-8 pb-4 flex justify-between items-center bg-[#0a0a0a]/90 backdrop-blur sticky top-0 z-20 border-b border-white/5">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold" id="user-avatar">U</div>
@@ -100,95 +106,138 @@
                 <button onclick="handleLogout()" class="text-red-500 hover:bg-red-500/10 p-2 rounded-full"><i class="fa-solid fa-power-off"></i></button>
             </div>
 
-            <div class="px-6 mt-8">
-                <div class="real-card relative group">
-                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
-                    <div class="relative z-10 flex justify-between items-start">
-                        <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
-                        <i class="fa-brands fa-cc-visa text-3xl text-white/90"></i>
-                    </div>
-                    <div class="relative z-10 flex items-center gap-3 mt-4">
-                        <div class="chip"></div>
-                        <i class="fa-solid fa-wifi rotate-90 text-white/50"></i>
-                    </div>
-                    <div class="relative z-10 mt-4">
-                        <div class="flex justify-between items-center">
-                            <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">**** **** **** ****</p>
-                            <button onclick="copyCardNum()" class="text-white/50 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+            <div id="tab-home" class="block animate-fade-in">
+                <div class="px-6 mt-8">
+                    <div class="real-card relative group">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
+                        <div class="relative z-10 flex justify-between items-start">
+                            <span class="font-bold text-2xl italic tracking-tighter text-white">RAFI PAY</span>
+                            <i class="fa-brands fa-cc-visa text-3xl text-white/90"></i>
                         </div>
-                    </div>
-                    <div class="relative z-10 flex justify-between items-end mt-5">
-                        <div>
-                            <p class="text-[9px] text-gray-300 uppercase tracking-widest">Holder</p>
-                            <p id="card-holder" class="font-mono-tech text-sm uppercase font-bold truncate max-w-[120px]">NAME</p>
+                        <div class="relative z-10 flex items-center gap-3 mt-4">
+                            <div class="chip"></div>
+                            <i class="fa-solid fa-wifi rotate-90 text-white/50"></i>
                         </div>
-                        <div class="flex gap-4">
-                            <div>
-                                <p class="text-[9px] text-gray-300 uppercase tracking-widest">Exp</p>
-                                <p id="card-exp" class="font-mono-tech text-sm font-bold">00/00</p>
+                        <div class="relative z-10 mt-4">
+                            <div class="flex justify-between items-center">
+                                <p id="card-num" class="font-mono-tech text-xl sm:text-2xl tracking-widest text-white drop-shadow-md">**** **** **** ****</p>
+                                <button onclick="copyCardNum()" class="text-white/50 hover:text-white"><i class="fa-regular fa-copy"></i></button>
                             </div>
-                            <div class="bg-white/10 px-2 py-0.5 rounded border border-white/20">
-                                <p class="text-[7px] text-gray-300 uppercase tracking-widest">CVV</p>
-                                <p id="card-cvv" class="font-mono-tech text-sm font-bold text-yellow-400">000</p>
+                        </div>
+                        <div class="relative z-10 flex justify-between items-end mt-5">
+                            <div>
+                                <p class="text-[9px] text-gray-300 uppercase tracking-widest">Holder</p>
+                                <p id="card-holder" class="font-mono-tech text-sm uppercase font-bold truncate max-w-[120px]">NAME</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <div>
+                                    <p class="text-[9px] text-gray-300 uppercase tracking-widest">Exp</p>
+                                    <p id="card-exp" class="font-mono-tech text-sm font-bold">00/00</p>
+                                </div>
+                                <div class="bg-white/10 px-2 py-0.5 rounded border border-white/20">
+                                    <p class="text-[7px] text-gray-300 uppercase tracking-widest">CVV</p>
+                                    <p id="card-cvv" class="font-mono-tech text-sm font-bold text-yellow-400">000</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="px-6 mt-6 grid grid-cols-2 gap-3">
+                    <button onclick="regenerateCard()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-purple-400">
+                        <i class="fa-solid fa-rotate mr-2"></i> New Card
+                    </button>
+                    <button onclick="copyAllIdentity()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-green-400">
+                        <i class="fa-solid fa-address-card mr-2"></i> Copy Info
+                    </button>
+                </div>
+
+                <div class="px-6 mt-8">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 ml-1 tracking-widest">Community</h3>
+                    <div class="space-y-3">
+                        <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-blue-500/30 transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500"><i class="fa-solid fa-code"></i></div>
+                                <div><p class="text-sm font-bold text-white">Designer</p><p class="text-[10px] text-gray-500">Dhumketu Community</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                        </a>
+                        <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-purple-500/30 transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500"><i class="fa-solid fa-users-gear"></i></div>
+                                <div><p class="text-sm font-bold text-white">Team</p><p class="text-[10px] text-gray-500">Cyber 24 Agency</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                        </a>
+                        <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-green-500/30 transition group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500"><i class="fa-solid fa-users"></i></div>
+                                <div><p class="text-sm font-bold text-white">Group</p><p class="text-[10px] text-gray-500">Official Group</p></div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="px-6 mt-6 grid grid-cols-2 gap-3">
-                <button onclick="regenerateCard()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-purple-400">
-                    <i class="fa-solid fa-rotate mr-2"></i> New Card
-                </button>
-                <button onclick="copyAllIdentity()" class="bg-[#1a1a1a] border border-white/10 py-3 rounded-xl text-sm font-bold hover:bg-[#252525] text-green-400">
-                    <i class="fa-solid fa-address-card mr-2"></i> Copy Info
-                </button>
-            </div>
+            <div id="tab-address" class="hidden animate-fade-in px-6">
+                <div class="mt-8 mb-6">
+                    <h2 class="text-2xl font-bold text-white">Billing Address</h2>
+                    <p class="text-gray-400 text-sm">Generate real US address for your card.</p>
+                </div>
 
-            <div class="px-6 mt-8">
-                <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 ml-1 tracking-widest">Community & Support</h3>
-                <div class="space-y-3">
+                <div class="space-y-4">
+                    <label class="text-xs text-gray-500 uppercase tracking-widest ml-1">Paste Card Number</label>
+                    <div class="relative">
+                        <input type="text" id="paste-card-input" placeholder="0000 0000 0000 0000" class="glass-input font-mono-tech tracking-wider">
+                        <button onclick="pasteFromClip()" class="absolute right-3 top-3.5 text-blue-400 text-xs font-bold">PASTE</button>
+                    </div>
+
+                    <button onclick="generateBillingAddress()" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 font-bold text-white shadow-lg shadow-blue-500/20">
+                        Generate Billing Address
+                    </button>
+                </div>
+
+                <div id="address-result" class="mt-8 bg-[#111] border border-white/10 rounded-2xl p-6 hidden">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
+                        <h3 class="font-bold text-white"><i class="fa-solid fa-location-dot text-red-500 mr-2"></i>USA Address</h3>
+                        <button onclick="copyBilling()" class="text-xs bg-white/10 px-2 py-1 rounded text-gray-300 hover:text-white">Copy All</button>
+                    </div>
                     
-                    <a href="https://www.facebook.com/dhumketu.community" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-blue-500/30 transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-code"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-white">Designer Profile</p>
-                                <p class="text-[10px] text-gray-500">Dhumketu Community</p>
-                            </div>
+                    <div class="space-y-3 text-sm font-mono-tech text-gray-300">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Street</span>
+                            <span id="res-street" class="text-white text-right">---</span>
                         </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-
-                    <a href="https://www.facebook.com/cyber24UnderCoverAgency" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-purple-500/30 transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-users-gear"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-white">Team Agency</p>
-                                <p class="text-[10px] text-gray-500">Cyber 24 UnderCover</p>
-                            </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">City</span>
+                            <span id="res-city" class="text-white text-right">---</span>
                         </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-
-                    <a href="https://facebook.com/groups/816629734768093/" target="_blank" class="flex items-center justify-between p-4 bg-[#111] border border-white/5 rounded-xl hover:border-green-500/30 transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 group-hover:bg-green-500 group-hover:text-white transition">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-white">Official Group</p>
-                                <p class="text-[10px] text-gray-500">Join Discussion</p>
-                            </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">State</span>
+                            <span id="res-state" class="text-white text-right">---</span>
                         </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-gray-600 group-hover:text-white"></i>
-                    </a>
-
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Zip Code</span>
+                            <span id="res-zip" class="text-white text-right">---</span>
+                        </div>
+                        <div class="flex justify-between border-t border-white/5 pt-2 mt-2">
+                            <span class="text-gray-500">Phone</span>
+                            <span id="res-phone" class="text-white text-right">---</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <div class="fixed bottom-[40px] left-0 w-full bg-[#0a0a0a]/90 backdrop-blur border-t border-white/5 p-2 flex justify-around z-40" id="bottom-menu">
+                <button onclick="switchTab('home')" class="nav-btn active" id="btn-home">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Cards</span>
+                </button>
+                <button onclick="switchTab('address')" class="nav-btn" id="btn-address">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Address</span>
+                </button>
             </div>
 
         </div>
