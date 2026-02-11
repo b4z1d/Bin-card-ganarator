@@ -1,8 +1,7 @@
 // app_core.js
 
-// --- DATABASE SIMULATION (Local Storage) ---
+// --- DATABASE SIMULATION ---
 const DB_KEY = 'rafi_pay_users_db';
-
 function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
 function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
 
@@ -26,8 +25,22 @@ function switchScreen(id) {
     setTimeout(() => target.classList.add('active-screen'), 10);
 }
 
-// --- CORE FUNCTIONS ---
+// --- TAB SWITCHING (NEW) ---
+function switchTab(tabName) {
+    // Hide all tabs
+    document.getElementById('tab-home').classList.add('hidden');
+    document.getElementById('tab-address').classList.add('hidden');
+    
+    // Reset buttons
+    document.getElementById('btn-home').classList.remove('active');
+    document.getElementById('btn-address').classList.remove('active');
 
+    // Show selected
+    document.getElementById('tab-' + tabName).classList.remove('hidden');
+    document.getElementById('btn-' + tabName).classList.add('active');
+}
+
+// --- CORE FUNCTIONS ---
 let currentUser = null;
 
 function handleLogin() {
@@ -36,11 +49,9 @@ function handleLogin() {
 
     if(!email || !pass) { showToast("Enter credentials", "error"); return; }
 
-    // 1. Check Admin File
     const admin = SECURE_VAULT.find(a => atob(a.e) === email && atob(a.p) === pass);
     if(admin) {
         const db = getDB();
-        // Create temp session for admin if needed
         if(!db[email]) {
             db[email] = { name: admin.n, pass: pass, card: generateCard(admin.n) };
             saveDB(db);
@@ -49,7 +60,6 @@ function handleLogin() {
         return;
     }
 
-    // 2. Check User Database
     const db = getDB();
     if(db[email] && db[email].pass === pass) {
         loginUser(email, db[email]);
@@ -77,18 +87,15 @@ function handleRegister() {
     switchScreen('screen-login');
 }
 
-// --- FORGOT PASSWORD FEATURE ---
 function handleForgot() {
     const email = prompt("Enter your registered Email:");
     if(!email) return;
-    
     const db = getDB();
     const user = db[email.toLowerCase().trim()];
-    
     if(user) {
-        alert(`Hello ${user.name},\nYour Password is: ${user.pass}\n\n(Please keep it safe!)`);
+        alert(`Hello ${user.name},\nYour Password is: ${user.pass}`);
     } else {
-        alert("No account found with this email!");
+        alert("No account found!");
     }
 }
 
@@ -96,6 +103,7 @@ function loginUser(email, data) {
     currentUser = { email, ...data };
     loadDashboard();
     switchScreen('screen-dash');
+    switchTab('home'); // Default to home
     showToast("Welcome Back!");
 }
 
@@ -105,7 +113,6 @@ function handleLogout() {
     switchScreen('screen-login');
 }
 
-// --- CARD GENERATOR ---
 function generateCard(name) {
     const bin = "4" + Math.floor(Math.random() * 90000 + 10000);
     let num = bin; while(num.length < 15) num += Math.floor(Math.random()*10);
@@ -133,7 +140,7 @@ function loadDashboard() {
 }
 
 function regenerateCard() {
-    if(!confirm("Generate new card? Old one will be deleted.")) return;
+    if(!confirm("Generate new card?")) return;
     const newCard = generateCard(currentUser.name);
     const db = getDB();
     db[currentUser.email].card = newCard;
@@ -152,4 +159,54 @@ function copyAllIdentity() {
     const c = currentUser.card;
     const info = `Name: ${c.holder}\nCard: ${c.number}\nExp: ${c.exp}\nCVV: ${c.cvv}`;
     navigator.clipboard.writeText(info).then(() => showToast("Info Copied!"));
-                 }
+}
+
+// --- NEW: ADDRESS GENERATOR LOGIC ---
+function pasteFromClip() {
+    navigator.clipboard.readText().then(text => {
+        document.getElementById('paste-card-input').value = text;
+        showToast("Pasted!");
+    }).catch(err => {
+        showToast("Allow clipboard permission!", "error");
+    });
+}
+
+function generateBillingAddress() {
+    const input = document.getElementById('paste-card-input').value;
+    if(input.length < 10) { showToast("Invalid Card Number", "error"); return; }
+
+    // Random US Data
+    const streets = ["Maple Ave", "Oak St", "Washington Blvd", "Lakeview Dr", "Sunset Blvd", "Broadway"];
+    const cities = [
+        {c:"New York", s:"NY", z:"10001"},
+        {c:"Los Angeles", s:"CA", z:"90001"},
+        {c:"Miami", s:"FL", z:"33101"},
+        {c:"Chicago", s:"IL", z:"60601"},
+        {c:"Houston", s:"TX", z:"77001"}
+    ];
+    
+    const randomCity = cities[Math.floor(Math.random() * cities.length)];
+    const randomStreet = Math.floor(Math.random() * 9000 + 100) + " " + streets[Math.floor(Math.random() * streets.length)];
+    const randomPhone = "+1 (" + Math.floor(Math.random() * 800 + 200) + ") " + Math.floor(Math.random() * 800 + 100) + "-" + Math.floor(Math.random() * 9000 + 1000);
+
+    // Show Result
+    document.getElementById('res-street').innerText = randomStreet;
+    document.getElementById('res-city').innerText = randomCity.c;
+    document.getElementById('res-state').innerText = randomCity.s;
+    document.getElementById('res-zip').innerText = randomCity.z;
+    document.getElementById('res-phone').innerText = randomPhone;
+
+    document.getElementById('address-result').classList.remove('hidden');
+    showToast("Address Generated!");
+}
+
+function copyBilling() {
+    const s = document.getElementById('res-street').innerText;
+    const c = document.getElementById('res-city').innerText;
+    const st = document.getElementById('res-state').innerText;
+    const z = document.getElementById('res-zip').innerText;
+    const p = document.getElementById('res-phone').innerText;
+    
+    const full = `Street: ${s}\nCity: ${c}\nState: ${st}\nZip: ${z}\nPhone: ${p}\nCountry: USA`;
+    navigator.clipboard.writeText(full).then(() => showToast("Address Copied!"));
+                                                                      }
